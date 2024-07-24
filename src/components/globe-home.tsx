@@ -1,13 +1,6 @@
 import { motion } from "framer-motion";
-import dynamic from "next/dynamic";
 import { Label } from "./ui/label";
-
-const World = dynamic(
-  () => import("@/components/ui/globe").then((m) => m.World),
-  {
-    ssr: false,
-  }
-);
+import { World } from "./ui/globe";
 
 export function GlobeDemo() {
   const globeConfig = {
