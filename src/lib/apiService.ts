@@ -67,4 +67,4 @@ class ApiService {
 }
 
 // Create and export a single instance
-export const apiService = new ApiService("http://localhost:3000"); // Replace with your API base URL
+export const apiService = new ApiService(import.meta.env.VITE_API_URL); // Replace with your API base URL

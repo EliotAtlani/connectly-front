@@ -11,11 +11,11 @@ import { Auth0Provider } from "@auth0/auth0-react";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Auth0Provider
-      domain="dev-j8sjd88bmveue6wh.us.auth0.com"
-      clientId="Gz0SVHnLPJ6WYSbaH2WKVwCiNvmEyxcc"
+      domain={import.meta.env.VITE_AUTH0_DOMAIN}
+      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
       authorizationParams={{
         redirect_uri: window.location.origin + "/callback/login",
-        audience: "http://localhost:3000/",
+        // audience: import.meta.env.VITE_AUTH0_AUDIENCE,
       }}
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">

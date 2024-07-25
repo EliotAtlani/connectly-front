@@ -5,7 +5,8 @@ import MainLoader from "@/components/main-loader";
 import { apiService } from "@/lib/apiService";
 
 const LoginCallback = () => {
-  const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, isLoading, getAccessTokenSilently, logout } =
+    useAuth0();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,18 +20,33 @@ const LoginCallback = () => {
             localStorage.setItem("token", accessToken);
             apiService.setToken(accessToken);
 
-            const response = await apiService.get("/api/private");
-            console.log("Response from private route:", response);
+            // const response = await apiService.get("/api/private");
+            // console.log("Response from private route:", response);
             navigate("/home");
           } else {
             navigate("/");
+            logout({
+              logoutParams: {
+                returnTo: window.location.origin + "/callback/logout",
+              },
+            });
           }
         } catch (error) {
           console.error("Error fetching access token:", error);
           navigate("/");
+          logout({
+            logoutParams: {
+              returnTo: window.location.origin + "/callback/logout",
+            },
+          });
         }
       } else {
         navigate("/");
+        logout({
+          logoutParams: {
+            returnTo: window.location.origin + "/callback/logout",
+          },
+        });
       }
     };
 
