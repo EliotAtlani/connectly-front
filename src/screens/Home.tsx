@@ -20,6 +20,7 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
+  console.log("User:", user);
   useEffect(() => {
     const initializeSocketConnection = async () => {
       if (isAuthenticated) {

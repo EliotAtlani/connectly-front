@@ -20,8 +20,8 @@ const LoginCallback = () => {
             localStorage.setItem("token", accessToken);
             apiService.setToken(accessToken);
 
-            // const response = await apiService.get("/api/private");
-            // console.log("Response from private route:", response);
+            const response = await apiService.get("/api/private");
+            console.log("Response from private route:", response);
             navigate("/home");
           } else {
             navigate("/");
