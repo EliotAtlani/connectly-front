@@ -1,10 +1,11 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { Button } from "../ui/button";
 
 const LogoutButton = () => {
   const { logout } = useAuth0();
 
   return (
-    <button
+    <Button
       onClick={() =>
         logout({
           logoutParams: {
@@ -14,7 +15,7 @@ const LogoutButton = () => {
       }
     >
       Log Out
-    </button>
+    </Button>
   );
 };
 

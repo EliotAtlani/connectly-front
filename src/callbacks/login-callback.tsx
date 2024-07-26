@@ -5,7 +5,7 @@ import MainLoader from "@/components/main-loader";
 import { apiService } from "@/lib/apiService";
 
 const LoginCallback = () => {
-  const { isAuthenticated, isLoading, getAccessTokenSilently, logout } =
+  const { isAuthenticated, user, isLoading, getAccessTokenSilently, logout } =
     useAuth0();
   const navigate = useNavigate();
 
@@ -20,8 +20,22 @@ const LoginCallback = () => {
             localStorage.setItem("token", accessToken);
             apiService.setToken(accessToken);
 
-            const response = await apiService.get("/api/private");
-            console.log("Response from private route:", response);
+            if (!user?.sub) {
+              navigate("/");
+              logout({
+                logoutParams: {
+                  returnTo: window.location.origin + "/callback/logout",
+                },
+              });
+              return;
+            }
+
+            const response = await apiService.post("create-user", {
+              id: user?.sub,
+              username: user.nickname,
+            });
+            console.log("User created successfully:", response);
+
             navigate("/home");
           } else {
             navigate("/");

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -16,11 +15,9 @@ import { socketManager } from "@/lib/socket";
 
 const Home: React.FC = () => {
   const [roomName, setRoomName] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
   const navigate = useNavigate();
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
 
-  console.log("User:", user);
   useEffect(() => {
     const initializeSocketConnection = async () => {
       if (isAuthenticated) {
@@ -40,9 +37,8 @@ const Home: React.FC = () => {
   const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Joining room", roomName);
-    if (roomName !== "" && username !== "") {
-      socketManager.emit("join_room", { from_user: username, room: roomName });
-      navigate(`/chat/${roomName}/${username}`);
+    if (roomName !== "" && user?.sub !== "") {
+      navigate(`/chat/${roomName}`);
     } else {
       console.error("Missing room or username");
     }
@@ -51,24 +47,15 @@ const Home: React.FC = () => {
 
   return (
     <div className="w-full h-screen flex items-center justify-center">
+      <div className="absolute top-4 left-4">
+        <LogoutButton />
+      </div>
       <Card className="w-[300px]">
         <CardHeader>
           <CardTitle>Home</CardTitle>
-          <CardDescription>
-            {user?.email}:
-            {isAuthenticated ? "Authenticated" : "Not Authenticated"}
-          </CardDescription>
-          <LogoutButton />
         </CardHeader>
         <form onSubmit={handleOnSubmit}>
           <CardContent className="flex flex-col gap-4">
-            <Input
-              placeholder="Enter a username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
             <Input
               placeholder="Enter a room name"
               type="text"

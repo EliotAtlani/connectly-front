@@ -31,7 +31,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/chat/:roomId/:username",
+    path: "/chat/:roomId",
     element: <Chat />,
   },
   {

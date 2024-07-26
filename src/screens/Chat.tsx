@@ -14,14 +14,16 @@ import {
 import { useParams } from "react-router-dom";
 import { socketManager } from "@/lib/socket";
 import { useAuth0 } from "@auth0/auth0-react";
+import BackButton from "@/components/buttons/back-button";
 
 export default function Chat() {
-  const { roomId, username } = useParams();
+  const { roomId } = useParams();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const [userTyping, setUserTyping] = useState<string>("");
+  const { isAuthenticated, user, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
     const initializeSocketConnection = async () => {
@@ -42,17 +44,22 @@ export default function Chat() {
 
   useEffect(() => {
     if (isConnected) {
-      socketManager.emit("join_room", { from_user: username, room: roomId });
+      socketManager.emit("join_room", {
+        from_user: user?.sub,
+        room: roomId,
+      });
       socketManager.on("history_messages", (data) => {
         setMessages(data);
       });
 
-      socketManager.on("user_typing", () => {
+      socketManager.on("user_typing", (data) => {
+        setUserTyping(data.username);
         setIsTyping(true);
       });
 
       socketManager.on("user_stop_typing", () => {
         setIsTyping(false);
+        setUserTyping("");
       });
     }
 
@@ -63,7 +70,7 @@ export default function Chat() {
         socketManager.off("user_stop_typing");
       }
     };
-  }, [roomId, username, setIsConnected, isConnected]);
+  }, [roomId, user?.sub, setIsConnected, isConnected]);
   // Runs whenever a socketManager event is recieved from the server
   useEffect(() => {
     if (!isConnected) {
@@ -94,7 +101,7 @@ export default function Chat() {
     if (!isConnected) return;
     socketManager.emit("send_message", {
       content: message,
-      from_user: username,
+      from_user: user?.sub,
       room: roomId,
     });
     setMessage("");
@@ -103,19 +110,24 @@ export default function Chat() {
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <Card className="w-[400px] h-[600px] flex flex-col relative">
+        <div className="absolute left-4 top-4">
+          <BackButton />{" "}
+        </div>
         <CardHeader>
-          <CardTitle>Discussion</CardTitle>
-          <CardDescription>Chat avec tes amis ici !</CardDescription>
+          <CardTitle className="text-right">Discussion</CardTitle>
+          <CardDescription className="text-right">
+            Chat avec tes amis ici !
+          </CardDescription>
         </CardHeader>
         <CardContent className="grow py-0">
-          <Conversation messages={messages} username={username as string} />
+          <Conversation messages={messages} username={user?.sub as string} />
         </CardContent>
 
         <div className="absolute bottom-0 w-full px-6  z-1000 ">
           <div className=" w-[95%] mx-auto pb-2">
             {isTyping && (
               <div className="text-sm text-gray-500 italic">
-                Eliot is typing...
+                {userTyping} is typing...
               </div>
             )}
           </div>
@@ -125,7 +137,7 @@ export default function Chat() {
               setMessage={setMessage}
               sendMessage={sendMessage}
               room={roomId as string}
-              username={username as string}
+              username={user?.nickname as string}
               isConnected={isConnected}
             />
           </div>
