@@ -1,19 +1,23 @@
 import { motion } from "framer-motion";
 import { Label } from "./ui/label";
 import { World } from "./ui/globe";
+import { useTheme } from "./theme-provider";
 
 export function GlobeDemo() {
+  const { theme } = useTheme();
+
   const globeConfig = {
     pointSize: 4,
-    globeColor: "#062056",
+    globeColor: theme == "light" ? "#ffffff" : "#062056",
     showAtmosphere: true,
-    atmosphereColor: "#FFFFFF",
+    atmosphereColor: theme == "light" ? "#cccccc" : "#FFFFFF",
     atmosphereAltitude: 0.1,
-    emissive: "#062056",
+    emissive: theme == "light" ? "#ffffff" : "#062056",
     emissiveIntensity: 0.1,
     shininess: 0.9,
-    polygonColor: "rgba(255,255,255,0.7)",
-    ambientLight: "#38bdf8",
+    polygonColor:
+      theme == "light" ? "rgba(0, 0, 0, 0.2)" : "rgba(255,255,255,0.7)",
+    ambientLight: theme == "light" ? "#fbbf24" : "#38bdf8",
     directionalLeftLight: "#ffffff",
     directionalTopLight: "#ffffff",
     pointLight: "#ffffff",
@@ -25,7 +29,10 @@ export function GlobeDemo() {
     autoRotate: true,
     autoRotateSpeed: 0.5,
   };
-  const colors = ["#06b6d4", "#3b82f6", "#6366f1"];
+  const colors =
+    theme == "light"
+      ? ["#7c3aed", "#87cefa", "#ffa07a"]
+      : ["#06b6d4", "#3b82f6", "#6366f1"];
 
   const sampleArcs = [
     {

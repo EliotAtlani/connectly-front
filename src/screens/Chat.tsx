@@ -82,6 +82,7 @@ export default function Chat() {
         {
           content: data.content,
           from_user: data.from_user,
+          user_image: data.user_image,
           __createdtime__: data.__createdtime__,
         },
       ]);
@@ -102,6 +103,7 @@ export default function Chat() {
     socketManager.emit("send_message", {
       content: message,
       from_user: user?.sub,
+      user_image: user?.picture,
       room: roomId,
     });
     setMessage("");
@@ -109,7 +111,7 @@ export default function Chat() {
 
   return (
     <div className="w-full h-screen flex items-center justify-center">
-      <Card className="w-[400px] h-[600px] flex flex-col relative">
+      <Card className="w-[300px] md:w-[500px] h-[400px] md:h-[600px] flex flex-col relative">
         <div className="absolute left-4 top-4">
           <BackButton />{" "}
         </div>
