@@ -5,7 +5,7 @@ import { io, Socket } from "socket.io-client";
 class SocketManager {
   private socket: Socket | null = null;
   private token: string | null = null;
-  private readonly URL: string = import.meta.env.VITE_API_URL; // Update this to your server URL
+  private readonly URL: string = import.meta.env.VITE_API_WS_URL; // Update this to your server URL
   private isConnected: boolean = false;
 
   setToken(token: string): void {
