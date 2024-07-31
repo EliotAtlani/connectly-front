@@ -1,7 +1,17 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Button } from "../ui/button";
 
-const LogoutButton = () => {
+interface LogoutButtonProps {
+  variant?:
+    | "default"
+    | "link"
+    | "default"
+    | "outline"
+    | "destructive"
+    | "secondary"
+    | "ghost";
+}
+const LogoutButton = ({ variant = "default" }: LogoutButtonProps) => {
   const { logout } = useAuth0();
 
   return (
@@ -13,6 +23,8 @@ const LogoutButton = () => {
           },
         })
       }
+      variant={variant}
+      type="button"
     >
       Log Out
     </Button>

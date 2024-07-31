@@ -1,7 +1,8 @@
+import HashLoader from "react-spinners/HashLoader";
 const MainLoader = () => {
   return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <div className="w-full h-full ">Loading...</div>
+    <div className="w-screen h-screen flex items-center justify-center">
+      <HashLoader color="#7c3aed" />
     </div>
   );
 };

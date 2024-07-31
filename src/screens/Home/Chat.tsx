@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from "react";
 
-import Conversation from "../components/conversation";
-import { Message } from "../lib/types";
-import InputMessage from "../components/input-message";
+import Conversation from "../../components/conversation";
+import { Message } from "../../lib/types";
+import InputMessage from "../../components/input-message";
 import {
   Card,
   CardContent,
@@ -17,7 +17,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import BackButton from "@/components/buttons/back-button";
 
 export default function Chat() {
-  const { roomId } = useParams();
+  const { chatId } = useParams();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -46,7 +46,7 @@ export default function Chat() {
     if (isConnected) {
       socketManager.emit("join_room", {
         from_user: user?.sub,
-        room: roomId,
+        room: chatId,
       });
       socketManager.on("history_messages", (data) => {
         setMessages(data);
@@ -70,7 +70,7 @@ export default function Chat() {
         socketManager.off("user_stop_typing");
       }
     };
-  }, [roomId, user?.sub, setIsConnected, isConnected]);
+  }, [chatId, user?.sub, setIsConnected, isConnected]);
   // Runs whenever a socketManager event is recieved from the server
   useEffect(() => {
     if (!isConnected) {
@@ -104,7 +104,7 @@ export default function Chat() {
       content: message,
       from_user: user?.sub,
       user_image: user?.picture,
-      room: roomId,
+      room: chatId,
     });
     setMessage("");
   };
@@ -138,7 +138,7 @@ export default function Chat() {
               message={message}
               setMessage={setMessage}
               sendMessage={sendMessage}
-              room={roomId as string}
+              room={chatId as string}
               username={user?.nickname as string}
               isConnected={isConnected}
             />

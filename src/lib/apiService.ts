@@ -14,6 +14,8 @@ class ApiService {
       },
     });
 
+    this.initToken();
+
     this.api.interceptors.request.use(
       (config) => {
         if (this.token) {
@@ -25,6 +27,9 @@ class ApiService {
     );
   }
 
+  private initToken(): void {
+    this.token = localStorage.getItem("token");
+  }
   setToken(token: string): void {
     this.token = token;
     localStorage.setItem("token", token);

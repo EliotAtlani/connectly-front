@@ -3,10 +3,11 @@ import ReactDOM from "react-dom/client";
 
 import "./index.css";
 import { ThemeProvider } from "./components/theme-provider.tsx";
-import { ModeToggle } from "./components/ui/mode-toggle.tsx";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router/router.tsx";
 import { Auth0Provider } from "@auth0/auth0-react";
+
+import { Toaster } from "./components/ui/toaster.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -20,9 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <RouterProvider router={router} />
-        <div className="fixed top-4 right-4 z-100000000000000">
-          <ModeToggle />
-        </div>
+        <Toaster />
       </ThemeProvider>
     </Auth0Provider>
   </React.StrictMode>

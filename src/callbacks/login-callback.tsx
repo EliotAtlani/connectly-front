@@ -30,13 +30,18 @@ const LoginCallback = () => {
               return;
             }
 
-            const response = await apiService.post("create-user", {
+            const response = await apiService.post("users/create-user", {
               id: user?.sub,
               username: user.nickname,
             });
             console.log("User created successfully:", response);
-
-            navigate("/home");
+            //Save in local storage
+            localStorage.setItem("user", JSON.stringify(response.user));
+            if (response.user.isOnBoarded) {
+              navigate("/home");
+            } else {
+              navigate("/onboarding");
+            }
           } else {
             navigate("/");
             logout({

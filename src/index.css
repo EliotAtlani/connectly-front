@@ -77,3 +77,37 @@
   display: none;
   /* Chrome, Safari and Opera */
 }
+@font-face {
+  font-family: "Noto Sans";
+  src: local("NotoSans-Regular"), url('./assets/fonts/noto/NotoSans-Regular.ttf');
+  font-weight: 400;
+  /* Normal */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  src: local("NotoSans-Bold"), url('./assets/fonts/noto/NotoSans-Bold.ttf');
+  font-weight: 700;
+  /* Bold */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  src: local("NotoSans-Light"), url('./assets/fonts/noto/NotoSans-Light.ttf');
+  font-weight: 300;
+  /* Light */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  src: local("NotoSans-Medium"), url('./assets/fonts/noto/NotoSans-Medium.ttf');
+  font-weight: 500;
+  /* Medium */
+  font-style: normal;
+}
+body {
+  font-family: "Noto Sans", sans-serif;
+}
