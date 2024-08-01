@@ -1,14 +1,32 @@
-import { ConversationType } from "@/lib/types";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ChatType } from "@/lib/types";
 import { useState } from "react";
 import ChatInput from "./chat-input";
 import ChatConversationHistory from "./chat-conversation-history";
+import { socketManager } from "@/lib/socket";
+import { getUser } from "@/lib/utils";
 
 interface ChatMessagesProps {
-  chatData: ConversationType;
+  messages: ChatType[];
+  chatId: string;
 }
 
-const ChatMessages = ({ chatData }: ChatMessagesProps) => {
+const ChatMessages = ({ messages, chatId }: ChatMessagesProps) => {
   const [message, setMessage] = useState("");
+  const user = getUser();
+
+  const sendMessage = (e: any) => {
+    e.preventDefault();
+
+    socketManager.emit("send_message", {
+      content: message,
+      from_user_id: user?.userId,
+      user_image: user?.image,
+      from_username: user?.username,
+      chatId,
+    });
+    setMessage("");
+  };
 
   return (
     <div className="h-full">
@@ -17,17 +35,14 @@ const ChatMessages = ({ chatData }: ChatMessagesProps) => {
           <ChatInput
             message={message}
             setMessage={setMessage}
-            sendMessage={(e) => {
-              e.preventDefault();
-              console.log(message);
-            }}
+            sendMessage={sendMessage}
           />
         </div>
       </div>
 
       <div className="flex flex-col h-full">
         <div className="flex-grow overflow-hidden">
-          <ChatConversationHistory messages={chatData.messages} />
+          <ChatConversationHistory messages={messages} />
         </div>
       </div>
     </div>

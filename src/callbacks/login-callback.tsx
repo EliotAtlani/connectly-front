@@ -32,7 +32,7 @@ const LoginCallback = () => {
 
             const response = await apiService.post("users/create-user", {
               id: user?.sub,
-              username: user.nickname,
+              username: Date.now().toString(),
             });
             console.log("User created successfully:", response);
             //Save in local storage

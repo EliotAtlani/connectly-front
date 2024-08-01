@@ -14,6 +14,7 @@ import Settings from "@/screens/settings/Settings";
 import FriendsLayout from "@/screens/Friends/FriendsLayout";
 import AddFriend from "@/screens/Friends/AddFriend";
 import Friends from "@/screens/Friends/Friends";
+import NewChat from "@/screens/Home/NewChat";
 
 export const router = createBrowserRouter([
   {
@@ -64,6 +65,22 @@ export const router = createBrowserRouter([
           <MainLayout>
             <HomeLayout>
               <Chat1 />
+            </HomeLayout>
+          </MainLayout>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/home/new-chat",
+    element: <PrivateRoute />,
+    children: [
+      {
+        path: "/home/new-chat",
+        element: (
+          <MainLayout>
+            <HomeLayout>
+              <NewChat />
             </HomeLayout>
           </MainLayout>
         ),

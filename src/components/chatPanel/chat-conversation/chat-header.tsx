@@ -8,10 +8,10 @@ interface ChatHeaderProps {
 
 const ChatHeader = ({ chatData }: ChatHeaderProps) => {
   return (
-    <div className="w-full h-[70px] border-b-[1px] px-4 py-2 flex items-center">
+    <div className="w-full min-h-[80px] border-b-[1px] px-4 py-2 flex items-center">
       <div className="flex gap-2 items-center">
         <img
-          src={avatarList[chatData.image]}
+          src={avatarList[chatData.avatar]}
           alt="avatar"
           className="w-10 h-10 rounded-full"
         />

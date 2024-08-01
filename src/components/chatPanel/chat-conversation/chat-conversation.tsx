@@ -1,15 +1,21 @@
 import ChatHeader from "./chat-header";
-import { ConversationType } from "@/lib/types";
+import { ChatType, ConversationType } from "@/lib/types";
 import ChatMessages from "./chat-messages";
 
 interface ConversationsChatProps {
   chatData: ConversationType;
+  messages: ChatType[];
+  chatId: string;
 }
-const ConversationsChat = ({ chatData }: ConversationsChatProps) => {
+const ConversationsChat = ({
+  chatData,
+  chatId,
+  messages,
+}: ConversationsChatProps) => {
   return (
     <div className="h-full w-full flex flex-col relative">
       <ChatHeader chatData={chatData.data} />
-      <ChatMessages chatData={chatData} />
+      <ChatMessages messages={messages} chatId={chatId} />
     </div>
   );
 };

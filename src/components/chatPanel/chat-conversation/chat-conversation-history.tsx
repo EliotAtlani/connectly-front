@@ -1,4 +1,3 @@
-import { avatarList } from "@/data/avatar-list";
 import { ChatType } from "@/lib/types";
 import { cn, getUser } from "@/lib/utils";
 import { useEffect, useRef } from "react";
@@ -35,9 +34,9 @@ const ChatConversationHistory = ({
           )} */}
           <div
             className={cn(
-              msg.from_user_id === "System"
+              msg.senderId === "System"
                 ? "text-xs text-center w-[200px] rounded-md p-1 bg-black/20 mx-auto"
-                : msg.from_user_id === user?.userId
+                : msg.senderId === user?.userId
                 ? "flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm my-1 ml-auto bg-primary text-primary-foreground"
                 : "flex w-max max-w-[75%] flex-col gap-2 rounded-lg px-3 py-2 text-sm my-1 bg-muted"
             )}
@@ -46,6 +45,7 @@ const ChatConversationHistory = ({
           </div>
         </div>
       ))}
+      <div className="h-[110px]"></div>
     </div>
   );
 };

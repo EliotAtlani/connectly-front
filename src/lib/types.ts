@@ -19,7 +19,8 @@ export interface UserData {
 }
 
 export interface ConversationType {
-  chatId: string;
+  id: string;
+  name?: string;
   type: string;
   data: ConversationData;
   messages: ChatType[];
@@ -27,13 +28,50 @@ export interface ConversationType {
 
 export interface ConversationData {
   name: string;
-  image: number;
+  avatar: number;
 }
 export interface ChatType {
-  idMessage: string;
   content: string;
-  from_user_id: string;
-  from_username: string;
-  from_user_image: string;
-  createdAt: number;
+  senderId: string;
+  createdAt: string;
 }
+
+export interface SendMessage {
+  content: string;
+  from_user: string;
+  user_image: string;
+  chatId: string;
+  from_username: string;
+}
+
+export interface Friends {
+  avatar: number;
+  userId: string;
+  username: string;
+}
+
+export interface FriendRequest {
+  id: string;
+  createdAt: string;
+  senderId: string;
+  receiverId: string;
+  sender: {
+    username: string;
+    avatar: number;
+  };
+  status: StatusFriendRequest;
+}
+
+enum StatusFriendRequest {
+  PENDING = "PENDING",
+  ACCEPTED = "ACCEPTED",
+  REJECTED = "REJECTED",
+}
+
+export type DisplayConversationHistory = {
+  chatId: string;
+  name: string;
+  avatar: number;
+  lastMessage: string;
+  lastMessageDate: string;
+};

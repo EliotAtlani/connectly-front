@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const FriendsHeader = () => {
   const navigate = useNavigate();
   return (
-    <div className="flex justify-between items-start pr-4">
+    <div className="flex justify-between items-start ">
       <div className="flex flex-col gap-2">
         <Label className="text-xl font-bold">Friends</Label>
         <Label className="text-muted-foreground font-light">
