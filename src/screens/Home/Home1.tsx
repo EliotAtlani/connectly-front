@@ -36,7 +36,6 @@ const Home: React.FC = () => {
 
   const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Joining room", roomName);
     if (roomName !== "" && user?.sub !== "") {
       navigate(`/chat/${roomName}`);
     } else {

@@ -8,6 +8,7 @@ import { router } from "./router/router.tsx";
 import { Auth0Provider } from "@auth0/auth0-react";
 
 import { Toaster } from "./components/ui/toaster.tsx";
+import { FriendRequestProvider } from "./lib/providers/friendRequestProvider.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -20,8 +21,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       }}
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <RouterProvider router={router} />
-        <Toaster />
+        <FriendRequestProvider>
+          <RouterProvider router={router} />
+          <Toaster />
+        </FriendRequestProvider>
       </ThemeProvider>
     </Auth0Provider>
   </React.StrictMode>

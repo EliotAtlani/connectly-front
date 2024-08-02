@@ -23,7 +23,7 @@ export interface ConversationType {
   name?: string;
   type: string;
   data: ConversationData;
-  messages: ChatType[];
+  lastMessageReadId: string;
 }
 
 export interface ConversationData {
@@ -31,6 +31,7 @@ export interface ConversationData {
   avatar: number;
 }
 export interface ChatType {
+  id: string;
   content: string;
   senderId: string;
   createdAt: string;
@@ -48,6 +49,7 @@ export interface Friends {
   avatar: number;
   userId: string;
   username: string;
+  createdAt: string;
 }
 
 export interface FriendRequest {
@@ -74,4 +76,6 @@ export type DisplayConversationHistory = {
   avatar: number;
   lastMessage: string;
   lastMessageDate: string;
+  unreadMessageCount: number;
+  isTyping: boolean;
 };

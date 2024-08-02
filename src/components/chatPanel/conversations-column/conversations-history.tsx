@@ -38,7 +38,6 @@ const ConversationsHistory = () => {
         const response = await apiService.get(
           `/chat-conversations/${user?.userId}`
         );
-        console.log("NAIN", response);
         setConversations(response);
       } catch (error) {
         console.error(`Error in getChatData: ${error}`);
@@ -53,12 +52,17 @@ const ConversationsHistory = () => {
     if (isConnected) {
       socketManager.on("refresh_conversation", (data) => {
         //find the conversation and update it
+
         const updatedConversations = conversations.map((conversation) => {
           if (conversation.chatId === data.chatId) {
             return {
               ...conversation,
               lastMessage: data.content,
               lastMessageDate: data.date,
+              unreadMessageCount:
+                !data.is_other_in_room && data.from_user_id !== user?.userId
+                  ? conversation.unreadMessageCount + 1
+                  : 0,
             };
           }
           return conversation;
@@ -73,6 +77,40 @@ const ConversationsHistory = () => {
 
         setConversations(updatedConversations);
       });
+
+      socketManager.on("user_typing_conv", (data) => {
+        //Update conversation ID Chat with typing user
+        if (data.userId === user?.userId) {
+          return;
+        }
+        const updatedConversations = conversations.map((conversation) => {
+          if (conversation.chatId === data.chatId) {
+            return {
+              ...conversation,
+              isTyping: true,
+            };
+          }
+          return conversation;
+        });
+        setConversations(updatedConversations);
+      });
+
+      socketManager.on("user_stop_typing_conv", (data) => {
+        if (data.userId === user?.userId) {
+          return;
+        }
+        //Update conversation ID Chat with typing user
+        const updatedConversations = conversations.map((conversation) => {
+          if (conversation.chatId === data.chatId) {
+            return {
+              ...conversation,
+              isTyping: false,
+            };
+          }
+          return conversation;
+        });
+        setConversations(updatedConversations);
+      });
     }
 
     return () => {
@@ -83,7 +121,7 @@ const ConversationsHistory = () => {
   }, [setIsConnected, isConnected, conversations]);
 
   return (
-    <ScrollArea className="h-screen pr-4 w-full">
+    <ScrollArea className="h-screen  w-full">
       <div className="flex flex-col pt-0 w-full">
         {loading ? (
           <div className="flex items-center justify-center mt-4"></div>
@@ -91,11 +129,7 @@ const ConversationsHistory = () => {
           <Label>No conversations for the moment</Label>
         ) : (
           conversations.map((conversation, index) => (
-            <ConversationsRow
-              nbOfNewMessages={0}
-              conversationData={conversation}
-              key={index}
-            />
+            <ConversationsRow conversationData={conversation} key={index} />
           ))
         )}
       </div>

@@ -7,6 +7,7 @@ import { useToast } from "../ui/use-toast";
 import { apiService } from "@/lib/apiService";
 import { avatarList } from "@/data/avatar-list";
 import HashLoader from "react-spinners/HashLoader";
+import { format } from "date-fns";
 
 const FriendsList = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const FriendsList = () => {
   const user = getUser();
   const { toast } = useToast();
 
-  async function fetchFriendsRequest() {
+  async function fetchFriendsList() {
     try {
       const response = await apiService.get(
         `/users/friends-list/${user?.userId}`
@@ -34,8 +35,10 @@ const FriendsList = () => {
   }
 
   useEffect(() => {
-    fetchFriendsRequest();
+    fetchFriendsList();
   }, []);
+
+  console.log(friends);
 
   return (
     <div className="flex flex-col mt-4">
@@ -59,7 +62,10 @@ const FriendsList = () => {
             />
             <div className="flex flex-col gap-2">
               <Label className="font-bold"> {friend.username}</Label>
-              <Label className="font-light text-xs"> Friends since</Label>
+              <Label className="font-light text-xs">
+                {" "}
+                Friends since {format(friend.createdAt, "dd/MM/yyyy")}
+              </Label>
             </div>
           </div>
         ))

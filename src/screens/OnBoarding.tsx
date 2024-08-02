@@ -19,7 +19,6 @@ const OnBoarding = () => {
   const { toast } = useToast();
   const user = getUser();
 
-  console.log("User:", user);
   if (!user) {
     navigate("/");
     return null;
@@ -33,14 +32,13 @@ const OnBoarding = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log("Setting up user information");
       const data = {
         userId: user.userId,
         image: selectedAvatar,
         username: e.currentTarget.username.value,
       };
       const response = await saveOnBoardedUser(data);
-      console.log("User onboarded successfully:", response);
+
       updateUser(response.user);
       navigate("/home");
     } catch (error) {

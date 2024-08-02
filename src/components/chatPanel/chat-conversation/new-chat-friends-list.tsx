@@ -9,8 +9,9 @@ import { avatarList } from "@/data/avatar-list";
 import HashLoader from "react-spinners/HashLoader";
 import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
-import { ExternalLinkIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { socketManager } from "@/lib/socket";
+import { format } from "date-fns";
 
 const NewChatFriendsList = () => {
   const navigate = useNavigate();
@@ -43,7 +44,6 @@ const NewChatFriendsList = () => {
 
   const handleCreateChat = async (userId: string) => {
     try {
-      console.log("Creating chat", userId);
       const data = {
         usersId: [userId, user?.userId],
       };
@@ -59,6 +59,7 @@ const NewChatFriendsList = () => {
 
   useEffect(() => {
     socketManager.on("chat_created", (data) => {
+      console.log(data);
       navigate(`/home/chat/${data.id}`);
     });
 
@@ -79,7 +80,8 @@ const NewChatFriendsList = () => {
         friends.map((friend, index) => (
           <div
             key={index}
-            className="flex gap-2   hover:bg-muted rounded-sm px-2 py-2 w-full items-center justify-between  "
+            className="flex gap-2   hover:bg-muted rounded-sm px-2 py-2 w-full items-center justify-between cursor-pointer "
+            onClick={() => handleCreateChat(friend.userId)}
           >
             <div className="flex gap-2 items-start">
               <img
@@ -89,13 +91,14 @@ const NewChatFriendsList = () => {
               />
               <div className="flex flex-col gap-2">
                 <Label className="font-bold"> {friend.username}</Label>
+                <Label className="font-light text-xs">
+                  {" "}
+                  Friends since {format(friend.createdAt, "dd/MM/yyyy")}
+                </Label>
               </div>
             </div>
-            <button
-              className="mr-4"
-              onClick={() => handleCreateChat(friend.userId)}
-            >
-              <ExternalLinkIcon size={22} className="text-muted-foreground" />
+            <button className="mr-4">
+              <ArrowRightIcon size={22} className="text-muted-foreground" />
             </button>
           </div>
         ))

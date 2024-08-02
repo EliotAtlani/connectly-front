@@ -21,8 +21,8 @@ const AddFriend = () => {
         friendUsername: e.target.username.value,
       };
 
-      const response = await apiService.post("/users/add-friend", body);
-      console.log("Adding friend", response);
+      await apiService.post("/users/add-friend", body);
+
       toast({
         title: "Request send successfully",
       });

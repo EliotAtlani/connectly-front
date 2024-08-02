@@ -13,7 +13,6 @@ export const saveOnBoardedUser = async (data: {
     userOnBoardingSchema.parse(data);
 
     const response = await apiService.post("/users/onboard-user", data);
-    console.log("User onboarded successfully:", response);
     return response;
   } catch (error) {
     if (error instanceof z.ZodError) {

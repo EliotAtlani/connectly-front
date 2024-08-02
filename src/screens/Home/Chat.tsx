@@ -80,6 +80,7 @@ export default function Chat() {
       setMessages((state) => [
         ...state,
         {
+          id: data.id,
           content: data.content,
           from_user: data.from_user,
           user_image: data.user_image,

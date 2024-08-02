@@ -6,13 +6,16 @@ import { avatarList } from "@/data/avatar-list";
 import { FriendRequest } from "@/lib/types";
 import { CheckIcon, XIcon } from "lucide-react";
 import { useToast } from "../ui/use-toast";
+import { useFriendRequest } from "@/lib/providers/friendRequestProvider";
 
 const FriendsRequest = () => {
   const [friendsRequest, setFriendsRequest] = useState<FriendRequest[]>([]);
   const user = getUser();
   const { toast } = useToast();
 
-  async function fetchFriendsRequest() {
+  const { fetchFriendsRequest } = useFriendRequest();
+
+  async function getFriendsRequest() {
     try {
       const response = await apiService.get(
         `/users/friends-request/${user?.userId}`
@@ -29,7 +32,7 @@ const FriendsRequest = () => {
   }
 
   useEffect(() => {
-    fetchFriendsRequest();
+    getFriendsRequest();
   }, []);
 
   const handleAccept = async (friend: FriendRequest) => {
@@ -42,6 +45,7 @@ const FriendsRequest = () => {
       toast({
         title: "Friend request accepted",
       });
+      getFriendsRequest();
       fetchFriendsRequest();
     } catch (error) {
       console.log(error);

@@ -1,48 +1,64 @@
 import { PlusIcon, SendIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { socketManager } from "@/lib/socket";
+import { getUser } from "@/lib/utils";
 
 interface ChatInputProps {
   setMessage: (message: string) => void;
   message: string;
   sendMessage: (e: React.FormEvent) => void;
+  chatId: string;
+  isConnected: boolean;
 }
 
-const ChatInput = ({ setMessage, message, sendMessage }: ChatInputProps) => {
-  //   const [isTyping, setIsTyping] = useState(false);
+const ChatInput = ({
+  setMessage,
+  message,
+  sendMessage,
+  chatId,
+  isConnected,
+}: ChatInputProps) => {
+  const [isTyping, setIsTyping] = useState(false);
+  const user = getUser();
 
-  //   useEffect(() => {
-  //     let typingTimer: NodeJS.Timeout;
+  useEffect(() => {
+    let typingTimer: NodeJS.Timeout;
 
-  //     const handleTyping = () => {
-  //       if (!isConnected) return;
-  //       if (!isTyping) {
-  //         setIsTyping(true);
-  //         socketManager.emit("typing", { room, username });
-  //       }
+    const handleTyping = () => {
+      if (!isConnected) return;
+      if (!isTyping) {
+        setIsTyping(true);
+        socketManager.emit("typing", {
+          chatId,
+          username: user?.username,
+          userId: user?.userId,
+        });
+      }
 
-  //       clearTimeout(typingTimer);
-  //       typingTimer = setTimeout(() => {
-  //         setIsTyping(false);
-  //         if (!isConnected) return;
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => {
+        setIsTyping(false);
+        if (!isConnected) return;
 
-  //         socketManager.emit("stop_typing", { room, username });
-  //       }, 1000);
-  //     };
+        socketManager.emit("stop_typing", { chatId, userId: user?.userId });
+      }, 1000);
+    };
 
-  //     if (message && message.trim() !== "") {
-  //       handleTyping();
-  //     } else {
-  //       if (!isConnected) return;
+    if (message && message.trim() !== "") {
+      handleTyping();
+    } else {
+      if (!isConnected) return;
 
-  //       setIsTyping(false);
-  //       socketManager.emit("stop_typing", { room, username });
-  //     }
+      setIsTyping(false);
+      socketManager.emit("stop_typing", { chatId, username: user?.username });
+    }
 
-  //     return () => {
-  //       clearTimeout(typingTimer);
-  //     };
-  //   }, [message, isTyping, room, username]);
+    return () => {
+      clearTimeout(typingTimer);
+    };
+  }, [message, isTyping, chatId, user?.username]);
 
   return (
     <form className="w-full flex gap-2" onSubmit={sendMessage}>
