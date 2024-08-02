@@ -38,8 +38,6 @@ const FriendsList = () => {
     fetchFriendsList();
   }, []);
 
-  console.log(friends);
-
   return (
     <div className="flex flex-col mt-4">
       {loading ? (

@@ -14,7 +14,7 @@ export interface Message {
 export interface UserData {
   userId: string;
   username: string;
-  image: number;
+  avatar: number;
   isOnBoarded: boolean;
 }
 

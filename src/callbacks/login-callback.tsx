@@ -3,11 +3,13 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
 import MainLoader from "@/components/main-loader";
 import { apiService } from "@/lib/apiService";
+import { useFriendRequest } from "@/lib/providers/friendRequestProvider";
 
 const LoginCallback = () => {
   const { isAuthenticated, user, isLoading, getAccessTokenSilently, logout } =
     useAuth0();
   const navigate = useNavigate();
+  const { fetchFriendsRequest } = useFriendRequest();
 
   useEffect(() => {
     const handleLogin = async () => {
@@ -37,7 +39,9 @@ const LoginCallback = () => {
             console.log("User created successfully:", response);
             //Save in local storage
             localStorage.setItem("user", JSON.stringify(response.user));
+
             if (response.user.isOnBoarded) {
+              fetchFriendsRequest(response.user.userId);
               navigate("/home");
             } else {
               navigate("/onboarding");

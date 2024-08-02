@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiService } from "@/lib/apiService";
 import { buildZodError } from "@/lib/utils";
 import { userOnBoardingSchema } from "@/lib/zod";
@@ -14,7 +15,7 @@ export const saveOnBoardedUser = async (data: {
 
     const response = await apiService.post("/users/onboard-user", data);
     return response;
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       const errorObj = buildZodError(error);
       console.error("Validation error:", errorObj);
@@ -22,7 +23,7 @@ export const saveOnBoardedUser = async (data: {
     } else {
       // Handle other errors
       console.error("Error creating user:", error);
-      throw new Error("Error creating user");
+      throw new Error(error.response.data.message);
     }
   }
 };

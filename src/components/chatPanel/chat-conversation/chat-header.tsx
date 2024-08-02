@@ -1,7 +1,13 @@
 import { Label } from "@/components/ui/label";
 import { avatarList } from "@/data/avatar-list";
 import { ConversationData } from "@/lib/types";
-import { format } from "date-fns";
+import {
+  format,
+  isYesterday,
+  isToday,
+  isThisWeek,
+  differenceInDays,
+} from "date-fns";
 
 interface ChatHeaderProps {
   chatData: ConversationData;
@@ -13,6 +19,25 @@ interface ChatHeaderProps {
 }
 
 const ChatHeader = ({ chatData, lastPing, isTyping }: ChatHeaderProps) => {
+  const formatLastActive = (lastPingDate: string) => {
+    const date = new Date(lastPingDate);
+
+    if (isToday(date)) {
+      return `Last seen today at ${format(date, "HH:mm")}`;
+    } else if (isYesterday(date)) {
+      return `Last seen yesterday at ${format(date, "HH:mm")}`;
+    } else if (isThisWeek(date)) {
+      return `Last seen ${format(date, "EEEE")} at ${format(date, "HH:mm")}`;
+    } else if (differenceInDays(new Date(), date) < 365) {
+      return `Last seen ${format(date, "d MMMM")} at ${format(date, "HH:mm")}`;
+    } else {
+      return `Last seen ${format(date, "d MMMM yyyy")} at ${format(
+        date,
+        "HH:mm"
+      )}`;
+    }
+  };
+
   return (
     <div className="w-full min-h-[80px] border-b-[1px] px-4 py-2 flex items-center">
       <div className="flex gap-4 items-center">
@@ -23,16 +48,15 @@ const ChatHeader = ({ chatData, lastPing, isTyping }: ChatHeaderProps) => {
         />
         <div className="flex flex-col gap-1">
           <Label className="font-bold">{chatData.name}</Label>
-          <Label className="text-xs text-muted-foregroun font-light">
+          <Label className="text-xs text-muted-foreground font-light">
             {isTyping ? (
               <span className="text-xs text-muted-foreground italic">
                 is typing...
               </span>
             ) : lastPing?.isOnline ? (
-              `Active now`
+              "Online"
             ) : (
-              lastPing?.lastPing &&
-              `Last active at ${format(new Date(lastPing?.lastPing), "HH:mm")}`
+              lastPing?.lastPing && formatLastActive(lastPing.lastPing)
             )}
           </Label>
         </div>

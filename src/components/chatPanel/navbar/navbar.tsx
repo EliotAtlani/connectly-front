@@ -20,8 +20,8 @@ const Navbar = () => {
   const { numberFriendRequest } = useFriendRequest();
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-between  py-2 pt-5 bg-muted rounded-l-[10px]">
-      <div className="flex flex-col items-center gap-4">
+    <div className="w-full h-full flex md:flex-col items-center justify-between px-2 md:px-0 md:py-2 md:pt-5 bg-muted rounded-l-[10px]">
+      <div className="flex md:flex-col items-center gap-4">
         {tabs.map((tab, index) => {
           const Icon = tab.icon;
           return (
@@ -30,8 +30,10 @@ const Navbar = () => {
                 <TooltipTrigger
                   onClick={() => navigate(tab.href)}
                   className={cn(
-                    " p-2 rounded-sm cursor-pointer relative hover:bg-muted-foreground/10",
-                    location.pathname.startsWith(tab.href) && "bg-primary/80"
+                    " p-2 rounded-sm cursor-pointer relative ",
+                    location.pathname.startsWith(tab.href)
+                      ? "bg-primary/80"
+                      : "hover:bg-muted-foreground/10"
                   )}
                 >
                   <Icon
@@ -61,7 +63,7 @@ const Navbar = () => {
           );
         })}
       </div>
-      <div className="flex flex-col items-center gap-4 pb-2">
+      <div className="flex md:flex-col items-center gap-4 md:pb-2">
         <ModeToggle />
         <button
           onClick={() =>

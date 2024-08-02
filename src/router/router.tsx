@@ -15,6 +15,7 @@ import FriendsLayout from "@/screens/Friends/FriendsLayout";
 import AddFriend from "@/screens/Friends/AddFriend";
 import Friends from "@/screens/Friends/Friends";
 import NewChat from "@/screens/Home/NewChat";
+import FriendInfo from "@/screens/Friends/FriendInfo";
 
 export const router = createBrowserRouter([
   {
@@ -125,7 +126,9 @@ export const router = createBrowserRouter([
         path: "/friends/:friendId",
         element: (
           <MainLayout>
-            <FriendsLayout>Friend id</FriendsLayout>
+            <FriendsLayout>
+              <FriendInfo />
+            </FriendsLayout>
           </MainLayout>
         ),
       },

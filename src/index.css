@@ -111,14 +111,19 @@
 body {
   font-family: "Noto Sans", sans-serif;
 }
-
 /* Default scrollbar styles */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 5px;
 }
 
 /* Scrollbar track */
 ::-webkit-scrollbar-track {
-  background: transparent;
-  /* Your desired track color */
+  background: transparent
+  /* Dark mode track color */
+}
+
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 6px;
 }

@@ -28,7 +28,7 @@ const ChatMessages = ({
     socketManager.emit("send_message", {
       content: message,
       from_user_id: user?.userId,
-      user_image: user?.image,
+      user_image: user?.avatar,
       from_username: user?.username,
       chatId,
     });

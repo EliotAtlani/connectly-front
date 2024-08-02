@@ -69,6 +69,14 @@ class ApiService {
     const response: AxiosResponse<T> = await this.api.delete(url, config);
     return response.data;
   }
+  async patch<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    const response: AxiosResponse<T> = await this.api.patch(url, data, config);
+    return response.data;
+  }
 }
 
 // Create and export a single instance

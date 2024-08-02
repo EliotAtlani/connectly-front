@@ -55,6 +55,25 @@ const FriendsRequest = () => {
     }
   };
 
+  const handleRefuse = async (friend: FriendRequest) => {
+    try {
+      await apiService.post("/users/refuse-friend", {
+        userId: user?.userId,
+        senderId: friend.senderId,
+      });
+
+      toast({
+        title: "Friend request refused",
+      });
+      getFriendsRequest();
+      fetchFriendsRequest();
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "Error refusing friend request",
+      });
+    }
+  };
   return (
     <div className="flex flex-col mt-4">
       {friendsRequest.length === 0 && <Label>No friends request</Label>}
@@ -81,7 +100,10 @@ const FriendsRequest = () => {
             >
               <CheckIcon size={18} />
             </button>
-            <button className="bg-muted p-1 rounded-full text-red-500">
+            <button
+              className="bg-muted p-1 rounded-full text-red-500"
+              onClick={() => handleRefuse(friend)}
+            >
               <XIcon size={18} />
             </button>
           </div>

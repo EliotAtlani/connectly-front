@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {
   createContext,
   useContext,
@@ -10,7 +11,10 @@ import { apiService } from "../apiService";
 
 interface FriendRequestContextType {
   numberFriendRequest: number;
-  fetchFriendsRequest: () => Promise<void>;
+  fetchFriendsRequest: (
+    userId?: string,
+    additionalParam?: any
+  ) => Promise<void>;
 }
 
 const FriendRequestContext = createContext<
@@ -37,11 +41,16 @@ export const FriendRequestProvider: React.FC<FriendRequestProviderProps> = ({
   const [numberFriendRequest, setNumberFriendRequest] = useState<number>(0);
   const user = getUser(); // Adjust the typing if needed
 
-  const fetchFriendsRequest = async () => {
+  const fetchFriendsRequest = async (userId?: string) => {
     try {
+      let idUser = user?.userId;
+      if (!idUser) {
+        idUser = userId;
+      }
       const response = await apiService.get<number>(
-        `/users/friends-request-number/${user?.userId}`
+        `/users/friends-request-number/${idUser}`
       );
+
       setNumberFriendRequest(response);
     } catch (error) {
       console.log(error);
