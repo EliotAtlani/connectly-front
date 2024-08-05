@@ -1,6 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { avatarList } from "@/data/avatar-list";
-import { ConversationData } from "@/lib/types";
+import { ConversationType } from "@/lib/types";
 import {
   format,
   isYesterday,
@@ -8,17 +8,39 @@ import {
   isThisWeek,
   differenceInDays,
 } from "date-fns";
+import {
+  EllipsisVerticalIcon,
+  ImageIcon,
+  SearchIcon,
+  SettingsIcon,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import ChatSettings from "./chat-settings";
 
 interface ChatHeaderProps {
-  chatData: ConversationData;
+  chatData: ConversationType;
   lastPing: {
     isOnline: boolean;
     lastPing: string;
   } | null;
   isTyping: boolean;
+  getChatData: () => Promise<void>;
 }
 
-const ChatHeader = ({ chatData, lastPing, isTyping }: ChatHeaderProps) => {
+const ChatHeader = ({
+  chatData,
+  lastPing,
+  isTyping,
+  getChatData,
+}: ChatHeaderProps) => {
   const formatLastActive = (lastPingDate: string) => {
     const date = new Date(lastPingDate);
 
@@ -39,15 +61,15 @@ const ChatHeader = ({ chatData, lastPing, isTyping }: ChatHeaderProps) => {
   };
 
   return (
-    <div className="w-full min-h-[80px] border-b-[1px] px-4 py-2 flex items-center">
+    <div className="w-full min-h-[60px] border-b-[1px] border-none px-4 py-2 flex items-center justify-between bg-background/40 backdrop-blur-sm">
       <div className="flex gap-4 items-center">
         <img
-          src={avatarList[chatData.avatar]}
+          src={avatarList[chatData.data.avatar]}
           alt="avatar"
           className="w-10 h-10 rounded-full"
         />
         <div className="flex flex-col gap-1">
-          <Label className="font-bold">{chatData.name}</Label>
+          <Label className="font-bold">{chatData.data.name}</Label>
           <Label className="text-xs text-muted-foreground font-light">
             {isTyping ? (
               <span className="text-xs text-muted-foreground italic">
@@ -60,6 +82,38 @@ const ChatHeader = ({ chatData, lastPing, isTyping }: ChatHeaderProps) => {
             )}
           </Label>
         </div>
+      </div>
+      <div className="flex items-center">
+        <Dialog>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <EllipsisVerticalIcon size={24} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Chat settings</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+
+              <DialogTrigger className="w-full cursor-pointer">
+                <DropdownMenuItem className="cursor-pointer">
+                  <SettingsIcon size={18} className="mr-2" /> Settings
+                </DropdownMenuItem>
+              </DialogTrigger>
+              <DropdownMenuItem className="cursor-pointer">
+                <ImageIcon size={18} className="mr-2" />
+                Media
+              </DropdownMenuItem>
+
+              <DropdownMenuItem className="cursor-pointer">
+                <SearchIcon size={18} className="mr-2" />
+                Search
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DialogContent>
+            <ChatSettings chatData={chatData} getChatData={getChatData} />
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

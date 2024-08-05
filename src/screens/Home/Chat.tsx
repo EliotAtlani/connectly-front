@@ -1,36 +1,91 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState, useEffect } from "react";
-
-import Conversation from "../../components/conversation";
-import { Message } from "../../lib/types";
-import InputMessage from "../../components/input-message";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { socketManager } from "@/lib/socket";
 import { useAuth0 } from "@auth0/auth0-react";
-import BackButton from "@/components/buttons/back-button";
+import HashLoader from "react-spinners/HashLoader";
+import ConversationsChat from "@/components/chatPanel/chat-conversation/chat-conversation";
+import { apiService } from "@/lib/apiService";
+import { socketManager } from "@/lib/socket";
+import { ChatType, ConversationType } from "@/lib/types";
+import { getUser } from "@/lib/utils";
 
-export default function Chat() {
+const Chat = () => {
   const { chatId } = useParams();
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [chatData, setChatData] = useState<ConversationType | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [messages, setMessages] = useState<ChatType[]>([]);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [userTyping, setUserTyping] = useState<string>("");
-  const { isAuthenticated, user, getAccessTokenSilently } = useAuth0();
+  const [lastPing, setLastPing] = useState<{
+    isOnline: boolean;
+    lastPing: string;
+  } | null>(null);
+  const [page, setPage] = useState(2);
+  const [hasMore, setHasMore] = useState(true);
+  const { isAuthenticated } = useAuth0();
+  const user = getUser();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScroll, setCanScroll] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const firstMessageRef = useRef<HTMLDivElement | null>(null);
+
+  const fetchMessages = useCallback(async () => {
+    if (isLoadingMore) return;
+    if (page <= 1) return;
+    try {
+      setCanScroll(false);
+      setIsLoadingMore(true);
+
+      const scrollHeight = scrollRef.current?.scrollHeight;
+
+      if (page > 1) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+
+      const response = await apiService.get(
+        `/chat-messages/${chatId}/messages?page=${page}&pageSize=100`
+      );
+
+      setMessages((prevMessages) => [...response.messages, ...prevMessages]);
+      setHasMore(page < response.totalPages);
+
+      // scrollRef.current?.scrollTo(0, scrollHeight);
+
+      setTimeout(() => {
+        setCanScroll(true);
+
+        if (page > 1) {
+          const newScrollHeight = scrollRef.current?.scrollHeight;
+          if (scrollHeight && newScrollHeight) {
+            scrollRef.current?.scrollTo(0, newScrollHeight - scrollHeight);
+          }
+        }
+      }, 10);
+    } catch (error) {
+      console.error(`Error in fetchMessages: ${error}`);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [chatId, page, isLoadingMore]);
+
+  const fetchOriginalMessages = useCallback(async () => {
+    try {
+      const response = await apiService.get(
+        `/chat-messages/${chatId}/messages?page=1&pageSize=100`
+      );
+
+      setMessages(response.messages);
+      setHasMore(1 < response.totalPages);
+    } catch (error) {
+      console.error(`Error in fetchMessages: ${error}`);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [chatId, page, isLoadingMore]);
 
   useEffect(() => {
     const initializeSocketConnection = async () => {
       if (isAuthenticated) {
         try {
-          const token = await getAccessTokenSilently();
-          socketManager.setToken(token);
           socketManager.connect();
           setIsConnected(true);
         } catch (error) {
@@ -40,112 +95,134 @@ export default function Chat() {
     };
 
     initializeSocketConnection();
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isAuthenticated]);
+
+  async function getChatData() {
+    try {
+      const response = await apiService.get(`/chat/${chatId}/${user?.userId}`);
+      setChatData(response);
+    } catch (error) {
+      console.error(`Error in getChatData: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    getChatData();
+  }, [chatId]);
 
   useEffect(() => {
     if (isConnected) {
       socketManager.emit("join_room", {
-        from_user: user?.sub,
+        from_user: user?.userId,
         room: chatId,
       });
-      socketManager.on("history_messages", (data) => {
-        setMessages(data);
+      // socketManager.on("history_messages", (data) => {
+      //   setMessages(data.messages);
+      // });
+      socketManager.on("activity_user", (data) => {
+        setLastPing(data);
       });
-
-      socketManager.on("user_typing", (data) => {
-        setUserTyping(data.username);
+      socketManager.on("user_typing", () => {
         setIsTyping(true);
       });
-
       socketManager.on("user_stop_typing", () => {
         setIsTyping(false);
-        setUserTyping("");
+      });
+      socketManager.on("mark_as_read", (data) => {
+        if (data.userId !== user?.userId) return;
+        setChatData((state) => {
+          if (!state) return state;
+          return {
+            ...state,
+            lastMessageReadId: data.message_id,
+          };
+        });
       });
     }
 
     return () => {
       if (isConnected) {
         socketManager.off("history_messages");
+        socketManager.off("activity_user");
         socketManager.off("user_typing");
         socketManager.off("user_stop_typing");
+        socketManager.emit("leave_room", {
+          from_user: user?.userId,
+          room: chatId,
+        });
       }
     };
-  }, [chatId, user?.sub, setIsConnected, isConnected]);
-  // Runs whenever a socketManager event is recieved from the server
-  useEffect(() => {
-    if (!isConnected) {
-      return;
-    }
-    socketManager.on("receive_message", (data) => {
-      setMessages((state) => [
-        ...state,
-        {
-          id: data.id,
-          content: data.content,
-          from_user: data.from_user,
-          user_image: data.user_image,
-          __createdtime__: data.__createdtime__,
-        },
-      ]);
-    });
+  }, [chatId, setIsConnected, isConnected]);
 
-    // Remove event listener on component unmount
-    return () => {
-      if (isConnected) {
-        socketManager.off("receive_message");
-      }
-    };
+  useEffect(() => {
+    if (isConnected) {
+      socketManager.on("receive_message", (data) => {
+        console.log("received message", data);
+        setMessages((state) => [
+          ...state,
+          {
+            content: data.content,
+            senderId: data.senderId,
+            createdAt: data.createdAt,
+            type: data.type,
+            id: data.id,
+          },
+        ]);
+      });
+
+      return () => {
+        if (isConnected) {
+          socketManager.off("receive_message");
+        }
+      };
+    }
   }, [isConnected, setIsConnected]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sendMessage = (e: any) => {
-    e.preventDefault();
-    if (!isConnected) return;
-    socketManager.emit("send_message", {
-      content: message,
-      from_user: user?.sub,
-      user_image: user?.picture,
-      room: chatId,
-    });
-    setMessage("");
+  const handleScroll = () => {
+    if (scrollRef.current && scrollRef.current.scrollTop === 0 && hasMore) {
+      fetchMessages();
+      setPage((prevPage) => prevPage + 1);
+    }
   };
 
-  return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <Card className="w-[300px] md:w-[500px] h-[400px] md:h-[600px] flex flex-col relative">
-        <div className="absolute left-4 top-4">
-          <BackButton />{" "}
-        </div>
-        <CardHeader>
-          <CardTitle className="text-right">Discussion</CardTitle>
-          <CardDescription className="text-right">
-            Chat avec tes amis ici !
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grow py-0">
-          <Conversation messages={messages} username={user?.sub as string} />
-        </CardContent>
+  useEffect(() => {
+    fetchOriginalMessages();
+    setPage(2);
+  }, [chatId]);
 
-        <div className="absolute bottom-0 w-full px-6  z-1000 ">
-          <div className=" w-[95%] mx-auto pb-2">
-            {isTyping && (
-              <div className="text-sm text-gray-500 italic">
-                {userTyping} is typing...
-              </div>
-            )}
-          </div>
-          <div className="w-[100%] mx-auto bg-gradient-to-t to-transparent from-background via-background via-70% pb-4 pt-2">
-            <InputMessage
-              message={message}
-              setMessage={setMessage}
-              sendMessage={sendMessage}
-              room={chatId as string}
-              username={user?.nickname as string}
-              isConnected={isConnected}
-            />
-          </div>
-        </div>
-      </Card>
-    </div>
+  if (!chatId) return null;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center mt-10">
+        <HashLoader color="#7c3aed" />
+      </div>
+    );
+  }
+
+  if (!chatData) {
+    return <div>Chat not found</div>;
+  }
+
+  return (
+    <ConversationsChat
+      chatData={chatData}
+      messages={messages}
+      chatId={chatId}
+      lastPing={lastPing}
+      isConnected={isConnected}
+      isTyping={isTyping}
+      onScroll={handleScroll}
+      scrollRef={scrollRef}
+      canScroll={canScroll}
+      isLoadingMore={isLoadingMore}
+      firstMessageRef={firstMessageRef}
+      getChatData={getChatData}
+      setMessages={setMessages}
+    />
   );
-}
+};
+
+export default Chat;

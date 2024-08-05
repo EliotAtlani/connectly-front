@@ -19,6 +19,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         redirect_uri: window.location.origin + "/callback/login",
         audience: import.meta.env.VITE_AUTH0_AUDIENCE,
       }}
+      cacheLocation="localstorage"
     >
       <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
         <FriendRequestProvider>

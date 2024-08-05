@@ -8,6 +8,13 @@ import { DisplayConversationHistory } from "@/lib/types";
 import { getUser } from "@/lib/utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import ConversationsRow from "./conversations-row";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { ImageIcon, SearchIcon, SettingsIcon } from "lucide-react";
 
 const ConversationsHistory: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -125,10 +132,29 @@ const ConversationsHistory: React.FC = () => {
           <Label>No conversations for the moment</Label>
         ) : (
           conversations.map((conversation) => (
-            <ConversationsRow
-              key={conversation.chatId}
-              conversationData={conversation}
-            />
+            <ContextMenu key={conversation.chatId}>
+              <ContextMenuTrigger className="mr-2">
+                {" "}
+                <ConversationsRow conversationData={conversation} />
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem>
+                  {" "}
+                  <SettingsIcon size={18} className="mr-2" /> Settings
+                </ContextMenuItem>
+
+                <ContextMenuItem>
+                  {" "}
+                  <ImageIcon size={18} className="mr-2" />
+                  Media
+                </ContextMenuItem>
+                <ContextMenuItem>
+                  {" "}
+                  <SearchIcon size={18} className="mr-2" />
+                  Search
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           ))
         )}
       </div>

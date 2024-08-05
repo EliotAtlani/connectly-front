@@ -8,6 +8,7 @@ export interface Message {
   content: string;
   from_user: string;
   user_image: string;
+  type: "TEXT" | "IMAGE";
   __createdtime__: number;
 }
 
@@ -24,6 +25,7 @@ export interface ConversationType {
   type: string;
   data: ConversationData;
   lastMessageReadId: string;
+  backgroundImage: number;
 }
 
 export interface ConversationData {
@@ -35,6 +37,8 @@ export interface ChatType {
   content: string;
   senderId: string;
   createdAt: string;
+  type: "TEXT" | "IMAGE" | "LOCAL_IMAGE";
+  file?: File;
 }
 
 export interface SendMessage {

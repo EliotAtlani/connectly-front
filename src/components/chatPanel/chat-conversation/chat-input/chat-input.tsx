@@ -1,9 +1,12 @@
-import { PlusIcon, SendIcon } from "lucide-react";
+import { SendIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { socketManager } from "@/lib/socket";
 import { getUser } from "@/lib/utils";
+import ChatInputActions from "./chat-input-actions";
+import { useToast } from "@/components/ui/use-toast";
+import ImageWithOverlay from "@/components/ui/image-delete-overlay";
 
 interface ChatInputProps {
   setMessage: (message: string) => void;
@@ -11,6 +14,8 @@ interface ChatInputProps {
   sendMessage: (e: React.FormEvent) => void;
   chatId: string;
   isConnected: boolean;
+  file: File[];
+  setFile: React.Dispatch<React.SetStateAction<File[]>>;
 }
 
 const ChatInput = ({
@@ -19,9 +24,35 @@ const ChatInput = ({
   sendMessage,
   chatId,
   isConnected,
+  file,
+  setFile,
 }: ChatInputProps) => {
   const [isTyping, setIsTyping] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const user = getUser();
+  const { toast } = useToast();
+
+  const handleFilesSelected = useCallback(
+    (selectedFiles: File[]) => {
+      const maxSize = 1 * 1024 * 1024; // 1MB in bytes
+
+      const validFiles = selectedFiles.filter((file) => {
+        if (file.size > maxSize) {
+          console.log("File is too large");
+          toast({
+            description: `File ${file.name} is larger than 10MB and won't be uploaded.`,
+            variant: "destructive",
+          });
+          return false;
+        }
+        return true;
+      });
+      console.log(validFiles);
+      setFile((prevFiles) => [...prevFiles, ...validFiles]);
+    },
+    [toast]
+  );
 
   useEffect(() => {
     let typingTimer: NodeJS.Timeout;
@@ -61,10 +92,15 @@ const ChatInput = ({
   }, [message, isTyping, chatId, user?.username]);
 
   return (
-    <form className="w-full flex gap-2" onSubmit={sendMessage}>
-      <div className="rounded-full bg-primary w-10 flex items-center justify-center hover:bg-primary/70 transition duration-300 cursor-pointer">
-        <PlusIcon size={20} color="white" />
-      </div>
+    <form
+      className="w-[90%]  mx-auto flex gap-2 relative"
+      onSubmit={sendMessage}
+    >
+      <ChatInputActions
+        handleFilesSelected={handleFilesSelected}
+        fileInputRef={fileInputRef}
+      />
+      {file.length > 0 && <ImageWithOverlay files={file} setFile={setFile} />}
       <Input
         type="text"
         value={message}
@@ -72,7 +108,11 @@ const ChatInput = ({
         placeholder="Type a message..."
         className="w-full"
       />
-      <Button type="submit" disabled={message.trim() === ""}>
+
+      <Button
+        type="submit"
+        disabled={message.trim() === "" && file.length === 0}
+      >
         <SendIcon size={16} />
       </Button>
     </form>

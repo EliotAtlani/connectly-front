@@ -1,4 +1,3 @@
-import Chat from "@/screens/Home/Chat";
 import Login from "@/screens/Login";
 import Root from "@/screens/Root";
 import { createBrowserRouter } from "react-router-dom";
@@ -8,7 +7,6 @@ import LogoutCallback from "@/callbacks/logout-callback";
 import OnBoarding from "@/screens/OnBoarding";
 import HomeLayout from "@/screens/Home/HomeLayout";
 import Home from "@/screens/Home/Home";
-import Chat1 from "@/screens/Home/Chat1";
 import MainLayout from "@/screens/MainLayout";
 import Settings from "@/screens/settings/Settings";
 import FriendsLayout from "@/screens/Friends/FriendsLayout";
@@ -16,6 +14,7 @@ import AddFriend from "@/screens/Friends/AddFriend";
 import Friends from "@/screens/Friends/Friends";
 import NewChat from "@/screens/Home/NewChat";
 import FriendInfo from "@/screens/Friends/FriendInfo";
+import Chat from "@/screens/Home/Chat";
 
 export const router = createBrowserRouter([
   {
@@ -65,7 +64,7 @@ export const router = createBrowserRouter([
         element: (
           <MainLayout>
             <HomeLayout>
-              <Chat1 />
+              <Chat />
             </HomeLayout>
           </MainLayout>
         ),
@@ -150,10 +149,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  {
-    path: "/chat/:roomId",
-    element: <Chat />,
-  },
+
   {
     path: "/login",
     element: <Login />,

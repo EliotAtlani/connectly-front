@@ -1,11 +1,20 @@
+import { Label } from "@/components/ui/label";
 import { ChatType } from "@/lib/types";
 import { cn, getUser } from "@/lib/utils";
 import { format, isToday, isYesterday, differenceInDays } from "date-fns";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
+import HashLoader from "react-spinners/HashLoader";
+import ImageMessage from "./chat-component/image-msg";
+import ImageMessageLocal from "./chat-component/image-msg-local";
 
 interface ChatConversationHistoryProps {
   messages: ChatType[];
   lastMessageReadId: string;
+  onScroll: () => void;
+  scrollRef: React.RefObject<HTMLDivElement>;
+  canScroll: boolean;
+  isLoadingMore: boolean;
+  firstMessageRef: React.MutableRefObject<HTMLDivElement | null>;
 }
 
 // Utility function to group messages by date
@@ -37,13 +46,20 @@ const formatDateHeader = (dateString: string) => {
 const ChatConversationHistory = ({
   messages,
   lastMessageReadId,
+  onScroll,
+  scrollRef,
+  canScroll,
+  isLoadingMore,
+  firstMessageRef,
 }: ChatConversationHistoryProps) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const user = getUser();
+  // const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      if (canScroll) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
     }
   }, [messages]);
 
@@ -53,14 +69,26 @@ const ChatConversationHistory = ({
     <div
       ref={scrollRef}
       className="h-full overflow-y-auto px-10 py-4 space-y-2"
+      onScroll={onScroll}
     >
+      {isLoadingMore && (
+        <div className="flex justify-center">
+          <HashLoader color="#7c3aed" size={30} />
+        </div>
+      )}
       {Object.keys(groupedMessages).map((date, dateIndex) => (
         <div key={dateIndex}>
           <div className="text-center text-muted-foreground text-sm my-2">
-            {formatDateHeader(date)}
+            <Label className="bg-background/40 px-4 py-2 rounded-md text-foreground">
+              {formatDateHeader(date)}
+            </Label>
           </div>
           {groupedMessages[date].map((msg, msgIndex) => (
-            <div key={msgIndex} className="flex gap-2">
+            <div
+              key={msgIndex}
+              className="flex gap-2 my-1"
+              ref={msgIndex == 50 ? firstMessageRef : null}
+            >
               <div
                 className={cn(
                   msg.senderId === user?.userId ? "" : " flex items-end",
@@ -70,7 +98,7 @@ const ChatConversationHistory = ({
                 <div
                   className={cn(
                     msg.senderId === user?.userId ? " ml-auto " : "",
-                    "flex items-end gap-2"
+                    "flex items-end gap-2 "
                   )}
                 >
                   {msg.id === lastMessageReadId && (
@@ -78,21 +106,31 @@ const ChatConversationHistory = ({
                       Read
                     </span>
                   )}
-                  <div
-                    className={cn(
-                      msg.senderId === user?.userId
-                        ? "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm my-1  bg-primary text-primary-foreground"
-                        : "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm my-1 bg-muted"
-                    )}
-                  >
-                    <div className="flex justify-between items-end gap-2">
-                      <span>{msg.content}</span>
+                  {msg.type === "IMAGE" && (
+                    <ImageMessage content={msg.content} />
+                  )}
+                  {msg.type === "LOCAL_IMAGE" && (
+                    <ImageMessageLocal file={msg.file as File} />
+                  )}
+                  {msg.type === "TEXT" && (
+                    <div
+                      className={cn(
+                        msg.senderId === user?.userId
+                          ? "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm   bg-primary text-primary-foreground"
+                          : "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm  bg-muted"
+                      )}
+                    >
+                      <div className="flex justify-between items-end gap-2">
+                        <span>{msg.content}</span>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <span
-                  className={cn("text-[9px] text-muted-foreground  pb-2 ml-2")}
+                  className={cn(
+                    "text-[9px] text-muted-foreground  py-1 ml-2 bg-background/30 rounded-md px-1"
+                  )}
                 >
                   {format(new Date(msg.createdAt), "HH:mm")}
                 </span>

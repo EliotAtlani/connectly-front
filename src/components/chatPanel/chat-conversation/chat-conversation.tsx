@@ -12,6 +12,13 @@ interface ConversationsChatProps {
   } | null;
   isConnected: boolean;
   isTyping: boolean;
+  onScroll: () => void;
+  scrollRef: React.RefObject<HTMLDivElement>;
+  canScroll: boolean;
+  isLoadingMore: boolean;
+  firstMessageRef: React.MutableRefObject<HTMLDivElement | null>;
+  getChatData: () => Promise<void>;
+  setMessages: React.Dispatch<React.SetStateAction<ChatType[]>>;
 }
 const ConversationsChat = ({
   chatData,
@@ -20,19 +27,46 @@ const ConversationsChat = ({
   lastPing,
   isConnected,
   isTyping,
+  onScroll,
+  scrollRef,
+  canScroll,
+  isLoadingMore,
+  firstMessageRef,
+  getChatData,
+  setMessages,
 }: ConversationsChatProps) => {
   return (
-    <div className="h-full w-full flex flex-col relative">
+    <div
+      className="h-full w-full flex flex-col relative"
+      style={{
+        backgroundImage: `url('/src/assets/${chatData.backgroundImage}.jpg')`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        overflow: "hidden",
+        backgroundClip: "content-box",
+        width: "100%",
+        height: "100%",
+        borderTopRightRadius: "10px",
+        borderBottomRightRadius: "10px",
+      }}
+    >
       <ChatHeader
-        chatData={chatData.data}
+        chatData={chatData}
         lastPing={lastPing}
         isTyping={isTyping}
+        getChatData={getChatData}
       />
       <ChatMessages
         messages={messages}
         chatId={chatId}
         isConnected={isConnected}
         lastMessageReadId={chatData.lastMessageReadId}
+        onScroll={onScroll}
+        scrollRef={scrollRef}
+        canScroll={canScroll}
+        isLoadingMore={isLoadingMore}
+        firstMessageRef={firstMessageRef}
+        setMessages={setMessages}
       />
     </div>
   );
