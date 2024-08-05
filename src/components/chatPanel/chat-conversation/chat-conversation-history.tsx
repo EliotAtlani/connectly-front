@@ -6,6 +6,13 @@ import { useEffect } from "react";
 import HashLoader from "react-spinners/HashLoader";
 import ImageMessage from "./chat-component/image-msg";
 import ImageMessageLocal from "./chat-component/image-msg-local";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { CopyIcon, ReplyIcon, SmilePlusIcon } from "lucide-react";
 
 interface ChatConversationHistoryProps {
   messages: ChatType[];
@@ -53,7 +60,6 @@ const ChatConversationHistory = ({
   firstMessageRef,
 }: ChatConversationHistoryProps) => {
   const user = getUser();
-  // const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -89,52 +95,72 @@ const ChatConversationHistory = ({
               className="flex gap-2 my-1"
               ref={msgIndex == 50 ? firstMessageRef : null}
             >
-              <div
-                className={cn(
-                  msg.senderId === user?.userId ? "" : " flex items-end",
-                  "w-full flex items-end"
-                )}
-              >
+              <ContextMenu>
                 <div
                   className={cn(
-                    msg.senderId === user?.userId ? " ml-auto " : "",
-                    "flex items-end gap-2 "
+                    msg.senderId === user?.userId ? "" : " flex items-end",
+                    "w-full flex items-end"
                   )}
                 >
-                  {msg.id === lastMessageReadId && (
-                    <span className="text-muted-foreground text-[9px] mb-2">
-                      Read
-                    </span>
-                  )}
-                  {msg.type === "IMAGE" && (
-                    <ImageMessage content={msg.content} />
-                  )}
-                  {msg.type === "LOCAL_IMAGE" && (
-                    <ImageMessageLocal file={msg.file as File} />
-                  )}
-                  {msg.type === "TEXT" && (
-                    <div
-                      className={cn(
-                        msg.senderId === user?.userId
-                          ? "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm   bg-primary text-primary-foreground"
-                          : "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm  bg-muted"
-                      )}
-                    >
-                      <div className="flex justify-between items-end gap-2">
-                        <span>{msg.content}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  <div
+                    className={cn(
+                      msg.senderId === user?.userId ? " ml-auto " : "",
+                      "flex items-end gap-2 "
+                    )}
+                  >
+                    {msg.id === lastMessageReadId && (
+                      <span className="text-muted-foreground text-[9px] mb-2">
+                        Read
+                      </span>
+                    )}
+                    {msg.type === "IMAGE" && (
+                      <ContextMenuTrigger>
+                        <ImageMessage content={msg.content} />
+                      </ContextMenuTrigger>
+                    )}
+                    {msg.type === "LOCAL_IMAGE" && (
+                      <ContextMenuTrigger>
+                        <ImageMessageLocal file={msg.file as File} />
+                      </ContextMenuTrigger>
+                    )}
+                    {msg.type === "TEXT" && (
+                      <ContextMenuTrigger
+                        className={cn(
+                          msg.senderId === user?.userId
+                            ? "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm   bg-primary text-primary-foreground"
+                            : "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm  bg-muted"
+                        )}
+                      >
+                        <div className="flex justify-between items-end gap-2">
+                          <span>{msg.content}</span>
+                        </div>
+                      </ContextMenuTrigger>
+                    )}
+                  </div>
 
-                <span
-                  className={cn(
-                    "text-[9px] text-muted-foreground  py-1 ml-2 bg-background/30 rounded-md px-1"
-                  )}
-                >
-                  {format(new Date(msg.createdAt), "HH:mm")}
-                </span>
-              </div>
+                  <span
+                    className={cn(
+                      "text-[9px] text-muted-foreground  py-1 ml-2 bg-background/30 rounded-md px-1"
+                    )}
+                  >
+                    {format(new Date(msg.createdAt), "HH:mm")}
+                  </span>
+                </div>
+                <ContextMenuContent>
+                  <ContextMenuItem>
+                    <ReplyIcon size={16} className="mr-2" />
+                    Reply
+                  </ContextMenuItem>
+                  <ContextMenuItem>
+                    <SmilePlusIcon size={16} className="mr-2" />
+                    React
+                  </ContextMenuItem>
+                  <ContextMenuItem>
+                    <CopyIcon size={16} className="mr-2" />
+                    Copy
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             </div>
           ))}
         </div>

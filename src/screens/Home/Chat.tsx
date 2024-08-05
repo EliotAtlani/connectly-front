@@ -159,7 +159,6 @@ const Chat = () => {
   useEffect(() => {
     if (isConnected) {
       socketManager.on("receive_message", (data) => {
-        console.log("received message", data);
         setMessages((state) => [
           ...state,
           {

@@ -67,7 +67,9 @@ const ChatSettings = ({ chatData, getChatData }: ChatSettingsProps) => {
               )}
               onClick={() => setSelect(item)}
               style={{
-                backgroundImage: `url('https://live-chat-bucket-eliot.s3.amazonaws.com/background-images/${item}.jpg')`,
+                backgroundImage: `url('${
+                  import.meta.env.VITE_S3_BUCKET_URL
+                }/${item}.jpg')`,
                 backgroundSize: "cover",
               }}
             >

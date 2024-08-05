@@ -23,7 +23,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import ChatSettings from "./chat-settings";
+import ChatSettings from "./chat-settings/chat-settings";
+import { useState } from "react";
+import ChatMediasList from "./chat-settings/chat-medias-list";
 
 interface ChatHeaderProps {
   chatData: ConversationType;
@@ -41,6 +43,7 @@ const ChatHeader = ({
   isTyping,
   getChatData,
 }: ChatHeaderProps) => {
+  const [content, setContent] = useState<string>("settings");
   const formatLastActive = (lastPingDate: string) => {
     const date = new Date(lastPingDate);
 
@@ -93,15 +96,23 @@ const ChatHeader = ({
               <DropdownMenuLabel>Chat settings</DropdownMenuLabel>
               <DropdownMenuSeparator />
 
-              <DialogTrigger className="w-full cursor-pointer">
+              <DialogTrigger
+                className="w-full cursor-pointer"
+                onClick={() => setContent("settings")}
+              >
                 <DropdownMenuItem className="cursor-pointer">
                   <SettingsIcon size={18} className="mr-2" /> Settings
                 </DropdownMenuItem>
               </DialogTrigger>
-              <DropdownMenuItem className="cursor-pointer">
-                <ImageIcon size={18} className="mr-2" />
-                Media
-              </DropdownMenuItem>
+              <DialogTrigger
+                className="w-full cursor-pointer"
+                onClick={() => setContent("medias")}
+              >
+                <DropdownMenuItem className="cursor-pointer">
+                  <ImageIcon size={18} className="mr-2" />
+                  Media
+                </DropdownMenuItem>
+              </DialogTrigger>
 
               <DropdownMenuItem className="cursor-pointer">
                 <SearchIcon size={18} className="mr-2" />
@@ -111,7 +122,10 @@ const ChatHeader = ({
           </DropdownMenu>
 
           <DialogContent>
-            <ChatSettings chatData={chatData} getChatData={getChatData} />
+            {content === "settings" && (
+              <ChatSettings chatData={chatData} getChatData={getChatData} />
+            )}
+            {content === "medias" && <ChatMediasList chatData={chatData} />}
           </DialogContent>
         </Dialog>
       </div>

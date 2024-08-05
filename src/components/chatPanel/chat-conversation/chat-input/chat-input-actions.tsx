@@ -11,7 +11,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FileUpIcon, ImageUpIcon, PlusIcon, SmilePlusIcon } from "lucide-react";
+import { ImageUpIcon, PlusIcon, SmilePlusIcon } from "lucide-react";
 import Webcam from "react-webcam";
 import {
   Dialog,
@@ -20,17 +20,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
+import EmojiPicker from "emoji-picker-react";
 interface ChatInputActionsProps {
   handleFilesSelected: (selectedFile: File[]) => void;
   fileInputRef: React.RefObject<HTMLInputElement>;
+  setMessage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ChatInputActions: React.FC<ChatInputActionsProps> = ({
   handleFilesSelected,
   fileInputRef,
+  setMessage,
 }) => {
   const [showWebcam, setShowWebcam] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const webcamRef = useRef<Webcam>(null);
 
   const handleFiles = useCallback(
@@ -111,11 +114,14 @@ const ChatInputActions: React.FC<ChatInputActionsProps> = ({
               </DropdownMenuPortal>
             </DropdownMenuSub>
 
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <FileUpIcon size={18} className="mr-2" />
               File
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            </DropdownMenuItem> */}
+            <DropdownMenuItem
+              onClick={() => setShowEmojiPicker(true)}
+              className="cursor-pointer"
+            >
               <SmilePlusIcon size={18} className="mr-2" />
               Emojis
             </DropdownMenuItem>
@@ -130,6 +136,24 @@ const ChatInputActions: React.FC<ChatInputActionsProps> = ({
           />
         </DropdownMenu>
       </Dialog>
+      {showEmojiPicker && (
+        <div className="absolute bottom-14 left-0">
+          <div className="flex justify-end mb-2">
+            <Button
+              onClick={() => setShowEmojiPicker(false)}
+              variant={"outline"}
+            >
+              Close
+            </Button>
+          </div>
+
+          <EmojiPicker
+            onEmojiClick={(item) =>
+              setMessage((prev: string) => prev + item.emoji)
+            }
+          />
+        </div>
+      )}
     </>
   );
 };

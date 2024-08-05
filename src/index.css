@@ -127,3 +127,8 @@ body {
   background: hsl(var(--muted));
   border-radius: 6px;
 }
+
+.message-chat {
+  position: relative;
+}
+

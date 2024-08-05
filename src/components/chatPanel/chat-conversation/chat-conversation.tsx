@@ -39,7 +39,9 @@ const ConversationsChat = ({
     <div
       className="h-full w-full flex flex-col relative"
       style={{
-        backgroundImage: `url('https://live-chat-bucket-eliot.s3.amazonaws.com/background-images/${chatData.backgroundImage}.jpg')`,
+        backgroundImage: `url('${import.meta.env.VITE_S3_BUCKET_URL}/${
+          chatData.backgroundImage
+        }.jpg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         overflow: "hidden",

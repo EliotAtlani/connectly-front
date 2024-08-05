@@ -44,7 +44,7 @@ const ConversationsRow = ({ conversationData }: ConversationRowProps) => {
 
         <div className="flex items-center justify-between gap-2 w-full">
           <Label
-            className={`font-light  text-ellipsis whitespace-nowrap max-w-[200px] overflow-hidden`}
+            className={`font-light  text-ellipsis whitespace-nowrap max-w-[200px] overflow-hidden pb-1`}
           >
             {conversationData.isTyping ? (
               <span className="text-xs text-muted-foreground italic">

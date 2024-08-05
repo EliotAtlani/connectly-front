@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import ImageWithOverlay from "@/components/ui/image-delete-overlay";
 
 interface ChatInputProps {
-  setMessage: (message: string) => void;
+  setMessage: React.Dispatch<React.SetStateAction<string>>;
   message: string;
   sendMessage: (e: React.FormEvent) => void;
   chatId: string;
@@ -99,6 +99,7 @@ const ChatInput = ({
       <ChatInputActions
         handleFilesSelected={handleFilesSelected}
         fileInputRef={fileInputRef}
+        setMessage={setMessage}
       />
       {file.length > 0 && <ImageWithOverlay files={file} setFile={setFile} />}
       <Input
