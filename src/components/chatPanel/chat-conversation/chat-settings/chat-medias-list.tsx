@@ -1,8 +1,9 @@
 import { DialogTitle } from "@/components/ui/dialog";
 import { apiService } from "@/lib/apiService";
 import { ConversationType, Message } from "@/lib/types";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import HashLoader from "react-spinners/HashLoader";
+import ImageMessage from "../chat-component/image-msg";
 
 const ChatMediasList = ({ chatData }: { chatData: ConversationType }) => {
   const [medias, setMedias] = useState<Message[]>([]);
@@ -35,13 +36,13 @@ const ChatMediasList = ({ chatData }: { chatData: ConversationType }) => {
           <p className="text-muted-foreground">No medias found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-5 max-h-[500px] overflow-hidden overflow-y-auto">
+        <div className="grid grid-cols-4 gap-2 max-h-[500px] overflow-hidden overflow-y-auto">
           {medias?.map((media, index) => (
             <div key={index} className="flex items-center gap-4">
-              <img
-                src={media.content}
-                alt="media"
-                className="w-20 h-20 rounded-md"
+              <ImageMessage
+                content={media.content}
+                width={"w-24"}
+                height="h-24"
               />
             </div>
           ))}

@@ -71,6 +71,10 @@ const ChatConversationHistory = ({
 
   const groupedMessages = groupMessagesByDate(messages);
 
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
   return (
     <div
       ref={scrollRef}
@@ -155,7 +159,10 @@ const ChatConversationHistory = ({
                     <SmilePlusIcon size={16} className="mr-2" />
                     React
                   </ContextMenuItem>
-                  <ContextMenuItem>
+                  <ContextMenuItem
+                    onClick={() => handleCopy(msg.content)}
+                    className="cursor-pointer"
+                  >
                     <CopyIcon size={16} className="mr-2" />
                     Copy
                   </ContextMenuItem>

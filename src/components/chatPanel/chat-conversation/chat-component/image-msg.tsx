@@ -10,8 +10,18 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { apiService } from "@/lib/apiService";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { cn } from "@/lib/utils";
 
-const ImageMessage = ({ content }: { content: string }) => {
+interface ImageMessageProps {
+  content: string;
+  width?: string;
+  height?: string;
+}
+const ImageMessage = ({
+  content,
+  width = "max-w-44",
+  height = "max-w-44",
+}: ImageMessageProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
@@ -56,11 +66,11 @@ const ImageMessage = ({ content }: { content: string }) => {
 
   return (
     <Dialog>
-      <DialogTrigger className="w-44 h-44 my-2 flex items-center justify-center">
+      <DialogTrigger className={cn("my-2 flex items-center justify-center")}>
         <img
           src={content}
           alt="message"
-          className="max-w-44 max-h-44 object-cover rounded-md"
+          className={cn(" object-cover rounded-md", width, height)}
         />
       </DialogTrigger>
       <DialogContent className="p-0 m-0 bg-transparent border-none w-auto ">
@@ -70,8 +80,10 @@ const ImageMessage = ({ content }: { content: string }) => {
           className="flex justify-between items-center gap-10 mt-2"
           onSubmit={handleDownload}
         >
-          <DialogClose className="w-full">
-            <Button className="w-full mx-auto">Close</Button>
+          <DialogClose className="w-full" type="button">
+            <Button className="w-full mx-auto" type="button">
+              Close
+            </Button>
           </DialogClose>
           <SubmitButton className="w-full mx-auto" loading={loading}>
             Download

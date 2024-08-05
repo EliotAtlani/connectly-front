@@ -45,8 +45,10 @@ const ImageMessage = ({ file }: { file: File }) => {
           className="flex justify-between items-center gap-10 mt-2"
           onSubmit={handleDownload}
         >
-          <DialogClose className="w-full">
-            <Button className="w-full mx-auto">Close</Button>
+          <DialogClose className="w-full" type="button">
+            <Button className="w-full mx-auto" type="button">
+              Close
+            </Button>
           </DialogClose>
           <SubmitButton className="w-full mx-auto" loading={loading}>
             Download

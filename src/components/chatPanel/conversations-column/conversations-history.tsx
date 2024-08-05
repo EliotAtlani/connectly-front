@@ -146,7 +146,7 @@ const ConversationsHistory: React.FC = () => {
                 <ContextMenuItem>
                   {" "}
                   <ImageIcon size={18} className="mr-2" />
-                  Media
+                  Medias
                 </ContextMenuItem>
                 <ContextMenuItem>
                   {" "}

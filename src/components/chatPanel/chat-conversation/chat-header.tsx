@@ -110,7 +110,7 @@ const ChatHeader = ({
               >
                 <DropdownMenuItem className="cursor-pointer">
                   <ImageIcon size={18} className="mr-2" />
-                  Media
+                  Medias
                 </DropdownMenuItem>
               </DialogTrigger>
 
