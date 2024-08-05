@@ -39,7 +39,7 @@ const ConversationsChat = ({
     <div
       className="h-full w-full flex flex-col relative"
       style={{
-        backgroundImage: `url('/src/assets/${chatData.backgroundImage}.jpg')`,
+        backgroundImage: `url('https://live-chat-bucket-eliot.s3.amazonaws.com/background-images/${chatData.backgroundImage}.jpg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         overflow: "hidden",

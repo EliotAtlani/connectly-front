@@ -63,9 +63,9 @@ const ImageMessage = ({ content }: { content: string }) => {
           className="max-w-44 max-h-44 object-cover rounded-md"
         />
       </DialogTrigger>
-      <DialogContent className="p-0 m-0 bg-transparent border-none">
+      <DialogContent className="p-0 m-0 bg-transparent border-none w-auto ">
         <DialogTitle>Image</DialogTitle>
-        <img src={content} alt="message" className="rounded-md" />
+        <img src={content} alt="message" className="rounded-md mx-auto" />
         <form
           className="flex justify-between items-center gap-10 mt-2"
           onSubmit={handleDownload}
