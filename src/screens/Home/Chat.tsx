@@ -7,6 +7,7 @@ import { apiService } from "@/lib/apiService";
 import { socketManager } from "@/lib/socket";
 import { ChatType, ConversationType } from "@/lib/types";
 import { getUser } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 
 const Chat = () => {
   const { chatId } = useParams();
@@ -266,7 +267,14 @@ const Chat = () => {
   }
 
   if (!chatData) {
-    return <div>Chat not found</div>;
+    return (
+      <div className="w-full h-full items-center justify-center flex flex-col gap-4 ">
+        <Label className="text-6xl font-bold text-primary">404</Label>
+        <Label>
+          Chat not found <span className="text-lg">🥲</span>
+        </Label>
+      </div>
+    );
   }
 
   return (

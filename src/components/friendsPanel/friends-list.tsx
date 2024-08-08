@@ -8,10 +8,13 @@ import { apiService } from "@/lib/apiService";
 import { avatarList } from "@/data/avatar-list";
 import HashLoader from "react-spinners/HashLoader";
 import { format } from "date-fns";
+import SearchFriends from "../chatPanel/search-friends";
 
 const FriendsList = () => {
   const navigate = useNavigate();
   const [friends, setFriends] = useState<Friends[]>([]);
+  const [filterFriends, setFilterFriends] = useState<Friends[]>([]);
+
   const [loading, setLoading] = useState<boolean>(true);
   const user = getUser();
   const { toast } = useToast();
@@ -23,6 +26,7 @@ const FriendsList = () => {
       );
 
       setFriends(response);
+      setFilterFriends(response);
     } catch (error) {
       console.log(error);
       toast({
@@ -40,14 +44,20 @@ const FriendsList = () => {
 
   return (
     <div className="flex flex-col mt-4">
+      <SearchFriends
+        setFilterFriends={setFilterFriends}
+        friends={friends}
+        className={"mb-2"}
+      />
+
       {loading ? (
         <div className="flex items-center justify-center mt-4">
           <HashLoader color="#7c3aed" size={30} />{" "}
         </div>
-      ) : friends.length === 0 ? (
+      ) : filterFriends.length === 0 ? (
         <Label>No friends</Label>
       ) : (
-        friends.map((friend, index) => (
+        filterFriends.map((friend, index) => (
           <div
             key={index}
             className="flex gap-2   hover:bg-muted rounded-sm px-2 py-2 w-full items-start"

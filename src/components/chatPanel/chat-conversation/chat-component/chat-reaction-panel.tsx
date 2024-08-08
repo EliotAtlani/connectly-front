@@ -40,6 +40,7 @@ const ChatReactionPanel = ({
           <button
             key={index}
             onClick={() => handleReactToMessage(reaction.value, msg)}
+            className="text-xl"
           >
             {reaction.emoji}
           </button>

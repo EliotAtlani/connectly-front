@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
 import { Friends } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getUser } from "@/lib/utils";
 
-import { apiService } from "@/lib/apiService";
 import { avatarList } from "@/data/avatar-list";
 import HashLoader from "react-spinners/HashLoader";
 import { useToast } from "@/components/ui/use-toast";
@@ -13,34 +12,16 @@ import { ArrowRightIcon } from "lucide-react";
 import { socketManager } from "@/lib/socket";
 import { format } from "date-fns";
 
-const NewChatFriendsList = () => {
-  const navigate = useNavigate();
-  const [friends, setFriends] = useState<Friends[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+interface NewChatFriendsListProps {
+  friends: Friends[];
+  loading: boolean;
+}
+
+const NewChatFriendsList = ({ friends, loading }: NewChatFriendsListProps) => {
   const user = getUser();
+  const navigate = useNavigate();
+
   const { toast } = useToast();
-
-  async function fetchFriendsRequest() {
-    try {
-      const response = await apiService.get(
-        `/users/friends-list/${user?.userId}`
-      );
-
-      setFriends(response);
-    } catch (error) {
-      console.log(error);
-      toast({
-        title: "Error fetching friends request",
-        description: "Please try again later",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    fetchFriendsRequest();
-  }, []);
 
   const handleCreateChat = async (userId: string) => {
     try {

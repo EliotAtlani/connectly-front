@@ -14,11 +14,13 @@ import Friends from "@/screens/Friends/Friends";
 import NewChat from "@/screens/Home/NewChat";
 import FriendInfo from "@/screens/Friends/FriendInfo";
 import Chat from "@/screens/Home/Chat";
+import NotFound from "@/screens/NotFound";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
+    errorElement: <NotFound />,
   },
   {
     path: "/callback/login",
