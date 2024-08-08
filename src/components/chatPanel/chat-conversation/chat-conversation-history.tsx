@@ -2,7 +2,7 @@ import { Label } from "@/components/ui/label";
 import { ChatType } from "@/lib/types";
 import { cn, getUser } from "@/lib/utils";
 import { format, isToday, isYesterday, differenceInDays } from "date-fns";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import HashLoader from "react-spinners/HashLoader";
 import ImageMessage from "./chat-component/image-msg";
 import ImageMessageLocal from "./chat-component/image-msg-local";
@@ -13,6 +13,10 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { CopyIcon, ReplyIcon, SmilePlusIcon } from "lucide-react";
+import ReadTag from "./chat-component/read-tag";
+import ChatReply from "./chat-component/chat-reply";
+import ChatReactionPanel from "./chat-component/chat-reaction-panel";
+import ChatReactionDisplay from "./chat-component/chat-reaction-display";
 
 interface ChatConversationHistoryProps {
   messages: ChatType[];
@@ -22,6 +26,11 @@ interface ChatConversationHistoryProps {
   canScroll: boolean;
   isLoadingMore: boolean;
   firstMessageRef: React.MutableRefObject<HTMLDivElement | null>;
+  setReplyMessage: React.Dispatch<React.SetStateAction<ChatType | null>>;
+  replyMessage: ChatType | null;
+  msgInputRef: React.RefObject<HTMLInputElement>;
+  openReaction: string | null;
+  setOpenReaction: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 // Utility function to group messages by date
@@ -58,8 +67,14 @@ const ChatConversationHistory = ({
   canScroll,
   isLoadingMore,
   firstMessageRef,
+  setReplyMessage,
+  replyMessage,
+  msgInputRef,
+  openReaction,
+  setOpenReaction,
 }: ChatConversationHistoryProps) => {
   const user = getUser();
+  const messageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -75,10 +90,37 @@ const ChatConversationHistory = ({
     navigator.clipboard.writeText(text);
   };
 
+  const handleReply = (msg: ChatType) => {
+    setReplyMessage(msg);
+    // Use setTimeout to ensure the focus happens after state update
+    setTimeout(() => {
+      if (msgInputRef.current) {
+        msgInputRef.current.focus();
+      }
+    }, 0);
+  };
+
+  const scrollToMessage = useCallback((messageId: string) => {
+    const messageElement = messageRefs.current[messageId];
+    if (messageElement) {
+      // messageElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      scrollRef.current?.scrollTo({
+        top: messageElement.offsetTop - 100,
+        behavior: "smooth",
+      });
+    } else {
+      //Scroll the 0 top
+      scrollRef.current?.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
   return (
     <div
       ref={scrollRef}
-      className="h-full overflow-y-auto px-10 py-4 space-y-2"
+      className="h-full overflow-y-auto px-10 py-4 space-y-2 relative"
       onScroll={onScroll}
     >
       {isLoadingMore && (
@@ -88,7 +130,7 @@ const ChatConversationHistory = ({
       )}
       {Object.keys(groupedMessages).map((date, dateIndex) => (
         <div key={dateIndex}>
-          <div className="text-center text-muted-foreground text-sm my-2">
+          <div className="text-center text-muted-foreground text-sm my-4">
             <Label className="bg-background/40 px-4 py-2 rounded-md text-foreground">
               {formatDateHeader(date)}
             </Label>
@@ -96,14 +138,34 @@ const ChatConversationHistory = ({
           {groupedMessages[date].map((msg, msgIndex) => (
             <div
               key={msgIndex}
-              className="flex gap-2 my-1"
-              ref={msgIndex == 50 ? firstMessageRef : null}
+              className={cn(
+                "flex gap-2 my-1 relative",
+                msg?.reactions && msg?.reactions?.length > 0 ? "mb-8" : ""
+              )}
+              ref={(el) => {
+                if (msgIndex === 50) {
+                  firstMessageRef.current = el;
+                }
+                messageRefs.current[msg.id] = el;
+              }}
             >
+              {openReaction === msg.id && (
+                <ChatReactionPanel
+                  msg={msg}
+                  user={user}
+                  setOpenReaction={setOpenReaction}
+                />
+              )}
+
+              {msg?.reactions && msg?.reactions?.length > 0 && (
+                <ChatReactionDisplay msg={msg} user={user} />
+              )}
+
               <ContextMenu>
                 <div
                   className={cn(
                     msg.senderId === user?.userId ? "" : " flex items-end",
-                    "w-full flex items-end"
+                    "w-full flex items-end "
                   )}
                 >
                   <div
@@ -112,14 +174,10 @@ const ChatConversationHistory = ({
                       "flex items-end gap-2 "
                     )}
                   >
-                    {msg.id === lastMessageReadId && (
-                      <span className="text-muted-foreground text-[9px] mb-2">
-                        Read
-                      </span>
-                    )}
+                    {msg.id === lastMessageReadId && <ReadTag />}
                     {msg.type === "IMAGE" && (
                       <ContextMenuTrigger>
-                        <ImageMessage content={msg.content} />
+                        <ImageMessage msg={msg} user={user} />
                       </ContextMenuTrigger>
                     )}
                     {msg.type === "LOCAL_IMAGE" && (
@@ -131,31 +189,46 @@ const ChatConversationHistory = ({
                       <ContextMenuTrigger
                         className={cn(
                           msg.senderId === user?.userId
-                            ? "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm   bg-primary text-primary-foreground"
-                            : "flex  flex-col gap-2 rounded-lg px-3 py-2 text-sm  bg-muted"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted",
+                          "flex  flex-col rounded-lg  px-1 py-1 text-sm "
                         )}
                       >
-                        <div className="flex justify-between items-end gap-2">
-                          <span>{msg.content}</span>
+                        {msg.replyTo && (
+                          <ChatReply
+                            msg={msg}
+                            scrollToMessage={scrollToMessage}
+                            user={user}
+                          />
+                        )}
+                        <div className="flex justify-between items-end gap-2 ">
+                          <div className="flex justify-between items-end gap-2 px-2 py-1">
+                            <span>{msg.content}</span>
+                          </div>
+                          <span
+                            className={cn(
+                              "text-[9px] text-muted-foreground pr-2"
+                            )}
+                          >
+                            {format(new Date(msg.createdAt), "HH:mm")}
+                          </span>
                         </div>
                       </ContextMenuTrigger>
                     )}
                   </div>
-
-                  <span
-                    className={cn(
-                      "text-[9px] text-muted-foreground  py-1 ml-2 bg-background/30 rounded-md px-1"
-                    )}
-                  >
-                    {format(new Date(msg.createdAt), "HH:mm")}
-                  </span>
                 </div>
                 <ContextMenuContent>
-                  <ContextMenuItem>
+                  <ContextMenuItem
+                    onClick={() => handleReply(msg)}
+                    className="cursor-pointer"
+                  >
                     <ReplyIcon size={16} className="mr-2" />
                     Reply
                   </ContextMenuItem>
-                  <ContextMenuItem>
+                  <ContextMenuItem
+                    className="cursor-pointer"
+                    onClick={() => setOpenReaction(msg.id)}
+                  >
                     <SmilePlusIcon size={16} className="mr-2" />
                     React
                   </ContextMenuItem>
@@ -172,7 +245,7 @@ const ChatConversationHistory = ({
           ))}
         </div>
       ))}
-      <div className="h-[125px]"></div>
+      <div className={cn(replyMessage ? "h-[170px]" : "h-[125px]")}></div>
     </div>
   );
 };

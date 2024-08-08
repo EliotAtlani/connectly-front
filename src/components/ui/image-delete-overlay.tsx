@@ -16,7 +16,7 @@ const ImageWithOverlay: React.FC<ImageWithOverlayProps> = ({
     <div className="absolute bottom-12 rounded-md flex gap-2">
       {files.map((file, index) => (
         <div
-          className="relative  w-14 h-14"
+          className="relative  w-20 h-20"
           key={index}
           onMouseEnter={() => setIsHovering(index)}
           onMouseLeave={() => setIsHovering(null)}

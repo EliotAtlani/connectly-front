@@ -7,6 +7,8 @@ import { getUser } from "@/lib/utils";
 import ChatInputActions from "./chat-input-actions";
 import { useToast } from "@/components/ui/use-toast";
 import ImageWithOverlay from "@/components/ui/image-delete-overlay";
+import { ChatType, ConversationType } from "@/lib/types";
+import ChatInputReply from "./chat-input-reply";
 
 interface ChatInputProps {
   setMessage: React.Dispatch<React.SetStateAction<string>>;
@@ -16,6 +18,10 @@ interface ChatInputProps {
   isConnected: boolean;
   file: File[];
   setFile: React.Dispatch<React.SetStateAction<File[]>>;
+  replyMessage: ChatType | null;
+  chatData: ConversationType;
+  setReplyMessage: React.Dispatch<React.SetStateAction<ChatType | null>>;
+  msgInputRef: React.RefObject<HTMLInputElement>;
 }
 
 const ChatInput = ({
@@ -26,6 +32,10 @@ const ChatInput = ({
   isConnected,
   file,
   setFile,
+  replyMessage,
+  chatData,
+  setReplyMessage,
+  msgInputRef,
 }: ChatInputProps) => {
   const [isTyping, setIsTyping] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -39,7 +49,6 @@ const ChatInput = ({
 
       const validFiles = selectedFiles.filter((file) => {
         if (file.size > maxSize) {
-          console.log("File is too large");
           toast({
             description: `File ${file.name} is larger than 10MB and won't be uploaded.`,
             variant: "destructive",
@@ -48,7 +57,7 @@ const ChatInput = ({
         }
         return true;
       });
-      console.log(validFiles);
+
       setFile((prevFiles) => [...prevFiles, ...validFiles]);
     },
     [toast]
@@ -96,6 +105,13 @@ const ChatInput = ({
       className="w-[90%]  mx-auto flex gap-2 relative"
       onSubmit={sendMessage}
     >
+      {replyMessage && (
+        <ChatInputReply
+          replyMessage={replyMessage}
+          setReplyMessage={setReplyMessage}
+          chatData={chatData}
+        />
+      )}
       <ChatInputActions
         handleFilesSelected={handleFilesSelected}
         fileInputRef={fileInputRef}
@@ -108,6 +124,7 @@ const ChatInput = ({
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Type a message..."
         className="w-full"
+        ref={msgInputRef}
       />
 
       <Button

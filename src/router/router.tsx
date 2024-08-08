@@ -1,4 +1,3 @@
-import Login from "@/screens/Login";
 import Root from "@/screens/Root";
 import { createBrowserRouter } from "react-router-dom";
 import PrivateRoute from "./privateRoute";
@@ -148,10 +147,5 @@ export const router = createBrowserRouter([
         ),
       },
     ],
-  },
-
-  {
-    path: "/login",
-    element: <Login />,
   },
 ]);

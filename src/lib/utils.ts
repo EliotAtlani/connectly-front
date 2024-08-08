@@ -2,7 +2,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { z } from "zod";
-import { UserData } from "./types";
+import { ReactionType, UserData } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -21,4 +21,23 @@ export function getUser(): UserData | null {
 
 export function updateUser(user: UserData) {
   localStorage.setItem("user", JSON.stringify(user));
+}
+
+export function mapReaction(type: ReactionType) {
+  switch (type) {
+    case "LIKE":
+      return "👍";
+    case "LOVE":
+      return "❤️";
+    case "LAUGH":
+      return "😂";
+    case "WOW":
+      return "😮";
+    case "SAD":
+      return "😢";
+    case "ANGRY":
+      return "😡";
+    default:
+      return "";
+  }
 }

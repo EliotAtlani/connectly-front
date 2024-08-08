@@ -36,7 +36,6 @@ const LoginCallback = () => {
               id: user?.sub,
               username: Date.now().toString(),
             });
-            console.log("User created successfully:", response);
             //Save in local storage
             localStorage.setItem("user", JSON.stringify(response.user));
 

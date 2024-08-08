@@ -130,6 +130,67 @@ const Chat = () => {
       socketManager.on("user_stop_typing", () => {
         setIsTyping(false);
       });
+      socketManager.on("receive_reaction", (data) => {
+        setMessages((state) => {
+          if (!state) return state;
+          return state.map((message) => {
+            if (message.id === data.messageId) {
+              const existingReactionIndex = message.reactions?.findIndex(
+                (reaction) => reaction.userId === data.userId // Assuming each reaction has a userId
+              );
+
+              let updatedReactions;
+              if (
+                existingReactionIndex !== undefined &&
+                existingReactionIndex !== -1
+              ) {
+                // Replace the existing reaction
+                updatedReactions = [...(message.reactions || [])];
+                updatedReactions[existingReactionIndex] = data;
+              } else {
+                // Add the new reaction
+                updatedReactions = message.reactions
+                  ? [...message.reactions, data]
+                  : [data];
+              }
+
+              return {
+                ...message,
+                reactions: updatedReactions,
+              };
+            }
+            return message;
+          });
+        });
+      });
+
+      socketManager.on("delete_reaction", (data) => {
+        setMessages((state) => {
+          if (!state) return state;
+          return state.map((message) => {
+            if (message.id === data.messageId) {
+              const existingReactionIndex = message.reactions?.findIndex(
+                (reaction) => reaction.userId === data.userId
+              );
+
+              if (
+                existingReactionIndex !== undefined &&
+                existingReactionIndex !== -1
+              ) {
+                const updatedReactions = [...(message.reactions || [])];
+                updatedReactions.splice(existingReactionIndex, 1);
+
+                return {
+                  ...message,
+                  reactions: updatedReactions,
+                };
+              }
+            }
+            return message;
+          });
+        });
+      });
+
       socketManager.on("mark_as_read", (data) => {
         if (data.userId !== user?.userId) return;
         setChatData((state) => {
@@ -164,7 +225,10 @@ const Chat = () => {
           {
             content: data.content,
             senderId: data.senderId,
+            senderName: data.senderName,
             createdAt: data.createdAt,
+            replyToId: data.replyToId,
+            replyTo: data.replyTo,
             type: data.type,
             id: data.id,
           },

@@ -15,11 +15,10 @@ const Settings = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    console.log(user);
     if (user) {
       setSelectedAvatar(user?.avatar);
     }
-  }, []);
+  }, [user]);
 
   const handleSaveInfo = async (e: any) => {
     e.preventDefault();

@@ -13,7 +13,7 @@ const RegisterButton = ({ className }: { className?: string }) => {
       className={cn(className, "")}
       variant="outline"
     >
-      Register
+      Sign up
     </Button>
   );
 };

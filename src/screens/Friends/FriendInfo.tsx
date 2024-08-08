@@ -40,8 +40,6 @@ const FriendInfo = () => {
     fetchFriendInfo();
   }, [friendId]);
 
-  console.log(friendInfo);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center mt-4">

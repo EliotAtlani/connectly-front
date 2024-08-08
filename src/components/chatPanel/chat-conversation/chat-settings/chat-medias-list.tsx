@@ -3,7 +3,8 @@ import { apiService } from "@/lib/apiService";
 import { ConversationType, Message } from "@/lib/types";
 import { useEffect, useState } from "react";
 import HashLoader from "react-spinners/HashLoader";
-import ImageMessage from "../chat-component/image-msg";
+
+import ImageShow from "./image-show";
 
 const ChatMediasList = ({ chatData }: { chatData: ConversationType }) => {
   const [medias, setMedias] = useState<Message[]>([]);
@@ -13,7 +14,6 @@ const ChatMediasList = ({ chatData }: { chatData: ConversationType }) => {
     async function fetchMedias() {
       try {
         const response = await apiService.get(`/medias/${chatData.id}`);
-        console.log(response);
         setMedias(response);
       } catch (error) {
         console.error(`Error in fetchMedias: ${error}`);
@@ -39,11 +39,7 @@ const ChatMediasList = ({ chatData }: { chatData: ConversationType }) => {
         <div className="grid grid-cols-4 gap-2 max-h-[500px] overflow-hidden overflow-y-auto">
           {medias?.map((media, index) => (
             <div key={index} className="flex items-center gap-4">
-              <ImageMessage
-                content={media.content}
-                width={"w-24"}
-                height="h-24"
-              />
+              <ImageShow content={media.content} width={"w-24"} height="h-24" />
             </div>
           ))}
         </div>

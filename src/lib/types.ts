@@ -36,9 +36,21 @@ export interface ChatType {
   id: string;
   content: string;
   senderId: string;
+  senderName: string;
   createdAt: string;
   type: "TEXT" | "IMAGE" | "LOCAL_IMAGE";
   file?: File;
+  replyToId?: string;
+  replyTo?: ChatType;
+  reactions?: Reaction[];
+}
+
+export interface Reaction {
+  id: string;
+  type: ReactionType;
+  userId: string;
+  user: UserData;
+  messageId: string;
 }
 
 export interface SendMessage {
@@ -83,3 +95,12 @@ export type DisplayConversationHistory = {
   unreadMessageCount: number;
   isTyping: boolean;
 };
+
+export enum ReactionType {
+  LIKE = "LIKE",
+  LOVE = "LOVE",
+  HAHA = "LAUGH",
+  WOW = "WOW",
+  SAD = "SAD",
+  ANGRY = "ANGRY",
+}

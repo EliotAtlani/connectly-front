@@ -11,21 +11,17 @@ import { useToast } from "@/components/ui/use-toast";
 import { apiService } from "@/lib/apiService";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
-import { ChatType, UserData } from "@/lib/types";
-import { format } from "date-fns";
 
-interface ImageMessageProps {
-  msg: ChatType;
-  user: UserData | null;
+interface ImageShowProps {
+  content: string;
   width?: string;
   height?: string;
 }
-const ImageMessage = ({
-  msg,
-  user,
+const ImageShow = ({
+  content,
   width = "max-w-44",
   height = "max-w-44",
-}: ImageMessageProps) => {
+}: ImageShowProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
 
@@ -34,7 +30,7 @@ const ImageMessage = ({
     setLoading(true);
     try {
       const response = await apiService.post(`/upload-image/download`, {
-        url: msg.content,
+        url: content,
       });
 
       if (response && response.url) {
@@ -70,28 +66,16 @@ const ImageMessage = ({
 
   return (
     <Dialog>
-      <DialogTrigger
-        className={cn(
-          "my-2 flex flex-col  justify-center gap-1",
-          msg.senderId === user?.userId ? "items-end" : "items-start"
-        )}
-      >
+      <DialogTrigger className={cn("my-2 flex flex-col  justify-center gap-1")}>
         <img
-          src={msg.content}
+          src={content}
           alt="message"
           className={cn(" object-cover rounded-md", width, height)}
         />
-        <span
-          className={cn(
-            "text-[9px] text-muted-foreground bg-background/50 p-1 rounded-md "
-          )}
-        >
-          {format(new Date(msg.createdAt), "HH:mm")}
-        </span>
       </DialogTrigger>
       <DialogContent className="p-0 m-0 bg-transparent border-none w-auto ">
         <DialogTitle>Image</DialogTitle>
-        <img src={msg.content} alt="message" className="rounded-md mx-auto" />
+        <img src={content} alt="message" className="rounded-md mx-auto" />
         <form
           className="flex justify-between items-center gap-10 mt-2"
           onSubmit={handleDownload}
@@ -110,4 +94,4 @@ const ImageMessage = ({
   );
 };
 
-export default ImageMessage;
+export default ImageShow;

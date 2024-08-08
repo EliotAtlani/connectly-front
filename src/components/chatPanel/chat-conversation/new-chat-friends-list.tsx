@@ -59,7 +59,6 @@ const NewChatFriendsList = () => {
 
   useEffect(() => {
     socketManager.on("chat_created", (data) => {
-      console.log(data);
       navigate(`/home/chat/${data.id}`);
     });
 

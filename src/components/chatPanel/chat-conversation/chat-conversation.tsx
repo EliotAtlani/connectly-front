@@ -60,6 +60,7 @@ const ConversationsChat = ({
       />
       <ChatMessages
         messages={messages}
+        chatData={chatData}
         chatId={chatId}
         isConnected={isConnected}
         lastMessageReadId={chatData.lastMessageReadId}
