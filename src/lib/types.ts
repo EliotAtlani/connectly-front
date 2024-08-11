@@ -97,6 +97,7 @@ export type DisplayConversationHistory = {
   unreadMessageCount: number;
   isTyping: string[];
   type: "PRIVATE" | "GROUP";
+  pinned: boolean;
 };
 
 export enum ReactionType {

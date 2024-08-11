@@ -14,7 +14,8 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { ImageIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { PinIcon, PinOffIcon } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 const ConversationsHistory: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -45,12 +46,15 @@ const ConversationsHistory: React.FC = () => {
           return conversation;
         });
 
-        // Sort conversations by last message date
-        updatedConversations.sort(
-          (a, b) =>
+        // Sort conversations by pinned status and last message date
+        updatedConversations.sort((a, b) => {
+          if (a.pinned && !b.pinned) return -1;
+          if (!a.pinned && b.pinned) return 1;
+          return (
             new Date(b.lastMessageDate).getTime() -
             new Date(a.lastMessageDate).getTime()
-        );
+          );
+        });
 
         return updatedConversations;
       });
@@ -93,7 +97,6 @@ const ConversationsHistory: React.FC = () => {
     if (isConnected) {
       socketManager.on("refresh_conversation", updateConversation);
       socketManager.on("add_conversation", (data) => {
-        console.log("NEW_DATA", data);
         setConversations((prevConversations) => [
           {
             chatId: data.chatId,
@@ -104,6 +107,8 @@ const ConversationsHistory: React.FC = () => {
             lastMessageDate: data.date,
             unreadMessageCount: 0,
             isTyping: [],
+            pinned: data.isPinned || false, // Handle pinned status if available
+            isPinned: data.isPinned || false, // Handle pinned status if available
           },
           ...prevConversations,
         ]);
@@ -150,6 +155,78 @@ const ConversationsHistory: React.FC = () => {
       }
     };
   }, [isConnected, updateConversation, user?.userId]);
+
+  const handlePinConversation = (chatId: string, pinned: boolean) => {
+    try {
+      if (pinned) {
+        apiService.post(`/chat-conversations/unpin/${user?.userId}/${chatId}`);
+
+        //Sort
+        setConversations((prevConversations) => {
+          const updatedConversations = prevConversations.map((conversation) => {
+            if (conversation.chatId === chatId) {
+              return {
+                ...conversation,
+                pinned: !conversation.pinned,
+              };
+            }
+            return conversation;
+          });
+
+          // Sort conversations by pinned status and last message date
+          updatedConversations.sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return (
+              new Date(b.lastMessageDate).getTime() -
+              new Date(a.lastMessageDate).getTime()
+            );
+          });
+
+          return updatedConversations;
+        });
+
+        toast({
+          title: "Conversation unpinned",
+        });
+      } else {
+        apiService.post(`/chat-conversations/pin/${user?.userId}/${chatId}`);
+
+        //Sort
+        setConversations((prevConversations) => {
+          const updatedConversations = prevConversations.map((conversation) => {
+            if (conversation.chatId === chatId) {
+              return {
+                ...conversation,
+                pinned: !conversation.pinned,
+              };
+            }
+            return conversation;
+          });
+
+          // Sort conversations by pinned status and last message date
+          updatedConversations.sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return (
+              new Date(b.lastMessageDate).getTime() -
+              new Date(a.lastMessageDate).getTime()
+            );
+          });
+
+          return updatedConversations;
+        });
+
+        toast({
+          title: "Conversation pinned",
+        });
+      }
+    } catch (error) {
+      console.error(`Error in handlePinConversation: ${error}`);
+    }
+  };
+
+  console.log(conversations);
   return (
     <ScrollArea className="h-screen w-full">
       <div className="flex flex-col pt-0 w-full">
@@ -161,24 +238,26 @@ const ConversationsHistory: React.FC = () => {
           conversations.map((conversation) => (
             <ContextMenu key={conversation.chatId}>
               <ContextMenuTrigger className="mr-2">
-                {" "}
                 <ConversationsRow conversationData={conversation} />
               </ContextMenuTrigger>
               <ContextMenuContent>
-                <ContextMenuItem>
-                  {" "}
-                  <SettingsIcon size={18} className="mr-2" /> Settings
-                </ContextMenuItem>
-
-                <ContextMenuItem>
-                  {" "}
-                  <ImageIcon size={18} className="mr-2" />
-                  Medias
-                </ContextMenuItem>
-                <ContextMenuItem>
-                  {" "}
-                  <SearchIcon size={18} className="mr-2" />
-                  Search
+                <ContextMenuItem
+                  onClick={() =>
+                    handlePinConversation(
+                      conversation.chatId,
+                      conversation.pinned
+                    )
+                  }
+                >
+                  {!conversation.pinned ? (
+                    <>
+                      <PinIcon size={18} className="mr-2" /> Pin
+                    </>
+                  ) : (
+                    <>
+                      <PinOffIcon size={18} className="mr-2" /> Unpin
+                    </>
+                  )}
                 </ContextMenuItem>
               </ContextMenuContent>
             </ContextMenu>

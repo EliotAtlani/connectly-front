@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import DefaultUserGroup from "@/assets/default-group-image.png";
+import { PinIcon } from "lucide-react";
 
 interface ConversationRowProps {
   conversationData: DisplayConversationHistory;
@@ -82,6 +83,11 @@ const ConversationsRow = ({ conversationData }: ConversationRowProps) => {
                 {conversationData.unreadMessageCount}
               </span>
             </div>
+          )}
+          {conversationData.pinned && (
+            <span className="text-muted-foreground">
+              <PinIcon size={16} className="mr-2" />
+            </span>
           )}
         </div>
       </div>
