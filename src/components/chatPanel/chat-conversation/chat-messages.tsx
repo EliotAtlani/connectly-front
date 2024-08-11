@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChatType, ConversationType } from "@/lib/types";
+import { ChatType, ConversationType, UserData } from "@/lib/types";
 import { useEffect, useRef, useState } from "react";
 import ChatInput from "./chat-input/chat-input";
 import ChatConversationHistory from "./chat-conversation-history";
@@ -93,7 +93,7 @@ const ChatMessages = ({
             content: "",
             file: f,
             senderId: user?.userId as string,
-            senderName: user?.username as string,
+            sender: user as UserData,
             createdAt: new Date().toISOString(),
             type: "LOCAL_IMAGE",
             id: Math.random().toString(),
@@ -103,8 +103,6 @@ const ChatMessages = ({
         socketManager.emit("upload_image", {
           content: message,
           from_user_id: user?.userId,
-          user_image: user?.avatar,
-          from_username: user?.username,
           chatId,
           file: f,
           replyMessageId: replyMessage?.id,
@@ -119,8 +117,7 @@ const ChatMessages = ({
       socketManager.emit("send_message", {
         content: message,
         from_user_id: user?.userId,
-        user_image: user?.avatar,
-        from_username: user?.username,
+        sender: user as UserData,
         chatId,
         replyMessageId: replyMessage?.id,
         replyTo: replyMessage,
@@ -177,7 +174,6 @@ const ChatMessages = ({
             setFile={setFile}
             replyMessage={replyMessage}
             setReplyMessage={setReplyMessage}
-            chatData={chatData}
             msgInputRef={msgInputRef}
           />
         </div>
@@ -198,6 +194,7 @@ const ChatMessages = ({
             msgInputRef={msgInputRef}
             openReaction={openReaction}
             setOpenReaction={setOpenReaction}
+            chatData={chatData}
           />
         </div>
       </div>

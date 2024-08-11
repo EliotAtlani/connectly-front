@@ -119,9 +119,17 @@ const Chat = () => {
         from_user: user?.userId,
         room: chatId,
       });
-      // socketManager.on("history_messages", (data) => {
-      //   setMessages(data.messages);
-      // });
+
+      socketManager.on("refresh_header", (data) => {
+        setChatData((state) => {
+          if (!state) return state;
+          return {
+            ...state,
+            name: data.name ?? state.name,
+            image: data.image ?? state.image,
+          };
+        });
+      });
       socketManager.on("activity_user", (data) => {
         setLastPing(data);
       });
@@ -226,7 +234,7 @@ const Chat = () => {
           {
             content: data.content,
             senderId: data.senderId,
-            senderName: data.senderName,
+            sender: data.sender,
             createdAt: data.createdAt,
             replyToId: data.replyToId,
             replyTo: data.replyTo,

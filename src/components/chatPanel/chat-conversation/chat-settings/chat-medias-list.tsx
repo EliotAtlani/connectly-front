@@ -24,7 +24,7 @@ const ChatMediasList = ({ chatData }: { chatData: ConversationType }) => {
     fetchMedias();
   }, []);
   return (
-    <>
+    <div className="p-6 w-3/4 h-[500px]">
       <DialogTitle> Medias list</DialogTitle>
 
       {loading ? (
@@ -36,7 +36,7 @@ const ChatMediasList = ({ chatData }: { chatData: ConversationType }) => {
           <p className="text-muted-foreground">No medias found</p>
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-2 max-h-[500px] overflow-hidden overflow-y-auto">
+        <div className="grid grid-cols-4 gap-2  h-[440px] mt-4 overflow-hidden overflow-y-auto">
           {medias?.map((media, index) => (
             <div key={index} className="flex items-center gap-4">
               <ImageShow content={media.content} width={"w-24"} height="h-24" />
@@ -44,7 +44,7 @@ const ChatMediasList = ({ chatData }: { chatData: ConversationType }) => {
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 };
 

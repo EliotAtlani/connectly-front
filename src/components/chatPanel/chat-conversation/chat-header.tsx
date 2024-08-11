@@ -8,12 +8,7 @@ import {
   isThisWeek,
   differenceInDays,
 } from "date-fns";
-import {
-  EllipsisVerticalIcon,
-  ImageIcon,
-  SearchIcon,
-  SettingsIcon,
-} from "lucide-react";
+import { EllipsisVerticalIcon, ImageIcon, SettingsIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +20,8 @@ import {
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import ChatSettings from "./chat-settings/chat-settings";
 import { useState } from "react";
-import ChatMediasList from "./chat-settings/chat-medias-list";
+import DefaultUserGroup from "@/assets/default-group-image.png";
+import { cn } from "@/lib/utils";
 
 interface ChatHeaderProps {
   chatData: ConversationType;
@@ -65,29 +61,53 @@ const ChatHeader = ({
 
   return (
     <div className="w-full min-h-[60px] border-b-[1px] border-none px-4 py-2 flex items-center justify-between bg-background/40 backdrop-blur-sm">
-      <div className="flex gap-4 items-center">
-        <img
-          src={avatarList[chatData.data.avatar]}
-          alt="avatar"
-          className="w-10 h-10 rounded-full"
-        />
-        <div className="flex flex-col gap-1">
-          <Label className="font-bold">{chatData.data.name}</Label>
-          <Label className="text-xs text-muted-foreground font-light">
-            {isTyping ? (
-              <span className="text-xs text-muted-foreground italic">
-                is typing...
-              </span>
-            ) : lastPing?.isOnline ? (
-              "Online"
-            ) : (
-              lastPing?.lastPing && formatLastActive(lastPing.lastPing)
+      <Dialog>
+        <DialogTrigger
+          className="w-full cursor-pointer"
+          onClick={() => setContent("settings")}
+        >
+          <div className="flex gap-4 items-center">
+            {chatData.type === "PRIVATE" && (
+              <>
+                <img
+                  src={avatarList[chatData.data.avatar]}
+                  alt="avatar"
+                  className="w-10 h-10 rounded-full"
+                />
+                <div className="flex flex-col gap-1 items-start">
+                  <Label className="font-bold">{chatData.data.name}</Label>
+                  <Label className="text-xs text-muted-foreground font-light">
+                    {isTyping ? (
+                      <span className="text-xs text-muted-foreground italic">
+                        is typing...
+                      </span>
+                    ) : lastPing?.isOnline ? (
+                      "Online"
+                    ) : (
+                      lastPing?.lastPing && formatLastActive(lastPing.lastPing)
+                    )}
+                  </Label>
+                </div>
+              </>
             )}
-          </Label>
-        </div>
-      </div>
-      <div className="flex items-center">
-        <Dialog>
+            {chatData.type === "GROUP" && (
+              <>
+                <img
+                  src={chatData?.image ? chatData.image : DefaultUserGroup}
+                  alt="avatar"
+                  className={cn(
+                    "w-10 h-10 rounded-full object-cover",
+                    !chatData?.image && "bg-white p-1"
+                  )}
+                />
+                <div className="flex flex-col gap-1">
+                  <Label className="font-bold">{chatData.name}</Label>
+                </div>
+              </>
+            )}
+          </div>
+        </DialogTrigger>
+        <div className="flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger>
               <EllipsisVerticalIcon size={24} />
@@ -113,22 +133,21 @@ const ChatHeader = ({
                   Medias
                 </DropdownMenuItem>
               </DialogTrigger>
-
-              <DropdownMenuItem className="cursor-pointer">
-                <SearchIcon size={18} className="mr-2" />
-                Search
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DialogContent>
-            {content === "settings" && (
-              <ChatSettings chatData={chatData} getChatData={getChatData} />
-            )}
-            {content === "medias" && <ChatMediasList chatData={chatData} />}
+          <DialogContent
+            className="w-[60%] !max-w-full"
+            style={{ minHeight: "500px" }}
+          >
+            <ChatSettings
+              chatData={chatData}
+              getChatData={getChatData}
+              tab={content}
+            />
           </DialogContent>
-        </Dialog>
-      </div>
+        </div>
+      </Dialog>
     </div>
   );
 };

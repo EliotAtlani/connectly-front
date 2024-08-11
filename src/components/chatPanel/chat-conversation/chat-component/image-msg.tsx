@@ -23,8 +23,8 @@ interface ImageMessageProps {
 const ImageMessage = ({
   msg,
   user,
-  width = "max-w-44",
-  height = "max-w-44",
+  width = "w-44",
+  height = "h-44",
 }: ImageMessageProps) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();

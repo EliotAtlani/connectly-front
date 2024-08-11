@@ -8,6 +8,7 @@ interface ChatReplyProps {
 }
 const ChatReply = ({ msg, scrollToMessage, user }: ChatReplyProps) => {
   if (!msg.replyTo) return null;
+
   return (
     <div
       className="flex flex-col gap-2 rounded-lg px-3 py-2 text-sm bg-background/70"
@@ -17,7 +18,7 @@ const ChatReply = ({ msg, scrollToMessage, user }: ChatReplyProps) => {
         <Label className="text-muted-foreground">
           {msg.replyTo.senderId === user?.userId
             ? "You"
-            : msg.replyTo.senderName}
+            : msg.replyTo.sender?.username}
         </Label>
       </div>
 

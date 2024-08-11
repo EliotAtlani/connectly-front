@@ -1,18 +1,18 @@
 import { Label } from "@/components/ui/label";
-import { ChatType, ConversationType } from "@/lib/types";
+import { ChatType } from "@/lib/types";
+import { getUser } from "@/lib/utils";
 import { CameraIcon, XIcon } from "lucide-react";
 
 interface ChatInputReplyProps {
-  chatData: ConversationType;
   replyMessage: ChatType;
   setReplyMessage: React.Dispatch<React.SetStateAction<ChatType | null>>;
 }
 
 const ChatInputReply = ({
-  chatData,
   replyMessage,
   setReplyMessage,
 }: ChatInputReplyProps) => {
+  const user = getUser();
   return (
     <div className="absolute bottom-11 w-full bg-muted/80  px-4 py-3 rounded-md flex justify-between ">
       <div className="flex  w-full items-center gap-2">
@@ -22,7 +22,11 @@ const ChatInputReply = ({
         ></div>
         <div className="flex gap-2 flex-col overflow-hidden">
           <div className="flex items-center">
-            <Label>{chatData.data.name}</Label>
+            <Label>
+              {replyMessage.sender.username === user?.username
+                ? "You"
+                : replyMessage.sender.username}
+            </Label>
           </div>
           <div className="flex items-center overflow-hidden">
             <Label className="text-muted-foreground text-xs whitespace-nowrap ">

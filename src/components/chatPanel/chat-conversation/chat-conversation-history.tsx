@@ -1,5 +1,5 @@
 import { Label } from "@/components/ui/label";
-import { ChatType } from "@/lib/types";
+import { ChatType, ConversationType } from "@/lib/types";
 import { cn, getUser } from "@/lib/utils";
 import { format, isToday, isYesterday, differenceInDays } from "date-fns";
 import { useCallback, useEffect, useRef } from "react";
@@ -17,6 +17,7 @@ import ReadTag from "./chat-component/read-tag";
 import ChatReply from "./chat-component/chat-reply";
 import ChatReactionPanel from "./chat-component/chat-reaction-panel";
 import ChatReactionDisplay from "./chat-component/chat-reaction-display";
+import { avatarList } from "@/data/avatar-list";
 
 interface ChatConversationHistoryProps {
   messages: ChatType[];
@@ -31,6 +32,7 @@ interface ChatConversationHistoryProps {
   msgInputRef: React.RefObject<HTMLInputElement>;
   openReaction: string | null;
   setOpenReaction: React.Dispatch<React.SetStateAction<string | null>>;
+  chatData: ConversationType;
 }
 
 // Utility function to group messages by date
@@ -72,6 +74,7 @@ const ChatConversationHistory = ({
   msgInputRef,
   openReaction,
   setOpenReaction,
+  chatData,
 }: ChatConversationHistoryProps) => {
   const user = getUser();
   const messageRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -157,24 +160,33 @@ const ChatConversationHistory = ({
                 />
               )}
 
-              {msg?.reactions && msg?.reactions?.length > 0 && (
-                <ChatReactionDisplay msg={msg} user={user} />
-              )}
-
               <ContextMenu>
                 <div
                   className={cn(
-                    msg.senderId === user?.userId ? "" : " flex items-end",
+                    msg.senderId === user?.userId
+                      ? ""
+                      : " flex items-end gap-2",
                     "w-full flex items-end "
                   )}
                 >
+                  {msg.senderId !== user?.userId &&
+                    chatData.type === "GROUP" &&
+                    msg.type !== "SYSTEM" && (
+                      <img
+                        src={avatarList[msg.sender?.avatar]}
+                        alt="avatar"
+                        className="w-8 h-8 rounded-full"
+                      />
+                    )}
                   <div
                     className={cn(
                       msg.senderId === user?.userId ? " ml-auto " : "",
+                      msg.type === "SYSTEM" ? "!mx-auto" : "",
                       "flex items-end gap-2 "
                     )}
                   >
-                    {msg.id === lastMessageReadId && <ReadTag />}
+                    {chatData.type === "PRIVATE" &&
+                      msg.id === lastMessageReadId && <ReadTag />}
                     {msg.type === "IMAGE" && (
                       <ContextMenuTrigger>
                         <ImageMessage msg={msg} user={user} />
@@ -191,9 +203,12 @@ const ChatConversationHistory = ({
                           msg.senderId === user?.userId
                             ? "bg-primary text-primary-foreground"
                             : "bg-muted",
-                          "flex  flex-col rounded-lg  px-1 py-1 text-sm "
+                          "flex  flex-col rounded-lg  px-1 py-1 text-sm relative "
                         )}
                       >
+                        {msg?.reactions && msg?.reactions?.length > 0 && (
+                          <ChatReactionDisplay msg={msg} user={user} />
+                        )}
                         {msg.replyTo && (
                           <ChatReply
                             msg={msg}
@@ -202,7 +217,14 @@ const ChatConversationHistory = ({
                           />
                         )}
                         <div className="flex justify-between items-end gap-2 ">
-                          <div className="flex justify-between items-end gap-2 px-2 py-1">
+                          <div className="flex flex-col  items-start gap-2 px-2 py-1">
+                            {chatData.type === "GROUP" &&
+                              msg.senderId !== user?.userId && (
+                                <Label className="font-bold">
+                                  {" "}
+                                  {msg.sender.username}{" "}
+                                </Label>
+                              )}
                             <span>{msg.content}</span>
                           </div>
                           <span
@@ -214,6 +236,15 @@ const ChatConversationHistory = ({
                           </span>
                         </div>
                       </ContextMenuTrigger>
+                    )}
+                    {msg.type === "SYSTEM" && (
+                      <div className="my-2">
+                        <div className="flex flex-col  items-start gap-2 px-4 py-1 bg-muted/50  rounded-md">
+                          <span className="text-xs text-center ">
+                            {msg.content}
+                          </span>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

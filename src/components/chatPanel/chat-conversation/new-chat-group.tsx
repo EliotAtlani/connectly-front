@@ -3,20 +3,29 @@ import { Friends } from "@/lib/types";
 import { avatarList } from "@/data/avatar-list";
 import HashLoader from "react-spinners/HashLoader";
 import { Label } from "@/components/ui/label";
-import { ArrowRightIcon } from "lucide-react";
 import { format } from "date-fns";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface NewChatFriendsListProps {
   friends: Friends[];
   loading: boolean;
-  handleCreateChat: (userId: string) => Promise<void>;
+  userSelected: string[];
+  setUserSelected: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const NewChatFriendsList = ({
+const NewChatGroup = ({
   friends,
   loading,
-  handleCreateChat,
+  userSelected,
+  setUserSelected,
 }: NewChatFriendsListProps) => {
+  const handleClickRow = (userId: string) => {
+    if (userSelected.includes(userId)) {
+      setUserSelected(userSelected.filter((id) => id !== userId));
+    } else {
+      setUserSelected([...userSelected, userId]);
+    }
+  };
   return (
     <div className="flex flex-col mt-4">
       {loading ? (
@@ -30,9 +39,11 @@ const NewChatFriendsList = ({
           <div
             key={index}
             className="flex gap-2   hover:bg-muted rounded-sm px-2 py-2 w-full items-center justify-between cursor-pointer "
-            onClick={() => handleCreateChat(friend.userId)}
+            // onClick={() => handleCreateChat(friend.userId)}
+            onClick={() => handleClickRow(friend.userId)}
           >
-            <div className="flex gap-4 items-start">
+            <div className="flex gap-4 items-center ">
+              <Checkbox checked={userSelected.includes(friend.userId)} />
               <img
                 src={avatarList[friend.avatar]}
                 alt="profile"
@@ -46,9 +57,6 @@ const NewChatFriendsList = ({
                 </Label>
               </div>
             </div>
-            <button className="mr-4">
-              <ArrowRightIcon size={22} className="text-muted-foreground" />
-            </button>
           </div>
         ))
       )}
@@ -56,4 +64,4 @@ const NewChatFriendsList = ({
   );
 };
 
-export default NewChatFriendsList;
+export default NewChatGroup;

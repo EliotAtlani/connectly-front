@@ -4,6 +4,8 @@ import { DisplayConversationHistory } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import DefaultUserGroup from "@/assets/default-group-image.png";
+
 interface ConversationRowProps {
   conversationData: DisplayConversationHistory;
 }
@@ -15,15 +17,23 @@ const ConversationsRow = ({ conversationData }: ConversationRowProps) => {
     conversationData.unreadMessageCount = 0;
     navigate(`/home/chat/${conversationData.chatId}`);
   };
+
   return (
     <div
       className="flex gap-4 hover:bg-muted rounded-sm px-2 py-2 w-full items-start"
       onClick={handleNavigate}
     >
       <img
-        src={avatarList[conversationData.avatar]}
+        src={
+          conversationData?.type === "PRIVATE"
+            ? avatarList[conversationData.avatar as number]
+            : (conversationData.avatar as string) ?? DefaultUserGroup
+        }
         alt="avatar"
-        className="w-12 h-12 rounded-full"
+        className={cn(
+          "w-12 h-12 rounded-full object-cover",
+          !conversationData.avatar && "bg-white p-1"
+        )}
       />
 
       <div className="flex flex-col gap-2 w-full min-w-0 h-full">
@@ -46,12 +56,23 @@ const ConversationsRow = ({ conversationData }: ConversationRowProps) => {
           <Label
             className={`font-light  text-ellipsis whitespace-nowrap max-w-[200px] overflow-hidden pb-1`}
           >
-            {conversationData.isTyping ? (
+            {conversationData.isTyping?.length > 0 ? (
               <span className="text-xs text-muted-foreground italic">
-                is typing...
+                {conversationData.type === "GROUP"
+                  ? conversationData.isTyping[0] + " is typing..."
+                  : "is typing..."}
               </span>
             ) : (
-              conversationData.lastMessage
+              <>
+                <span className="text-xs text-muted-foreground font-bold">
+                  {conversationData.type === "GROUP" &&
+                    conversationData.lastMessage?.type !== "SYSTEM" &&
+                    conversationData.lastMessage?.sender?.username + ": "}
+                </span>
+                {["TEXT", "SYSTEM"].includes(conversationData.lastMessage?.type)
+                  ? conversationData.lastMessage.content
+                  : "Send an image"}
+              </>
             )}
           </Label>
 

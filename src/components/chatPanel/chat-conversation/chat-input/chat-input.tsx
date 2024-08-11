@@ -7,7 +7,7 @@ import { getUser } from "@/lib/utils";
 import ChatInputActions from "./chat-input-actions";
 import { useToast } from "@/components/ui/use-toast";
 import ImageWithOverlay from "@/components/ui/image-delete-overlay";
-import { ChatType, ConversationType } from "@/lib/types";
+import { ChatType } from "@/lib/types";
 import ChatInputReply from "./chat-input-reply";
 
 interface ChatInputProps {
@@ -19,7 +19,6 @@ interface ChatInputProps {
   file: File[];
   setFile: React.Dispatch<React.SetStateAction<File[]>>;
   replyMessage: ChatType | null;
-  chatData: ConversationType;
   setReplyMessage: React.Dispatch<React.SetStateAction<ChatType | null>>;
   msgInputRef: React.RefObject<HTMLInputElement>;
 }
@@ -33,7 +32,6 @@ const ChatInput = ({
   file,
   setFile,
   replyMessage,
-  chatData,
   setReplyMessage,
   msgInputRef,
 }: ChatInputProps) => {
@@ -50,7 +48,7 @@ const ChatInput = ({
       const validFiles = selectedFiles.filter((file) => {
         if (file.size > maxSize) {
           toast({
-            description: `File ${file.name} is larger than 10MB and won't be uploaded.`,
+            description: `File ${file.name} is larger than 1MB and won't be uploaded.`,
             variant: "destructive",
           });
           return false;
@@ -109,7 +107,6 @@ const ChatInput = ({
         <ChatInputReply
           replyMessage={replyMessage}
           setReplyMessage={setReplyMessage}
-          chatData={chatData}
         />
       )}
       <ChatInputActions

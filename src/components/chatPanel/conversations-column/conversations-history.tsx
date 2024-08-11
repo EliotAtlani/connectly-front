@@ -32,6 +32,8 @@ const ConversationsHistory: React.FC = () => {
           if (conversation.chatId === data.chatId) {
             return {
               ...conversation,
+              name: data.name ?? conversation.name,
+              avatar: data.avatar ?? conversation.avatar,
               lastMessage: data.content,
               lastMessageDate: data.date,
               unreadMessageCount:
@@ -90,13 +92,34 @@ const ConversationsHistory: React.FC = () => {
   useEffect(() => {
     if (isConnected) {
       socketManager.on("refresh_conversation", updateConversation);
+      socketManager.on("add_conversation", (data) => {
+        console.log("NEW_DATA", data);
+        setConversations((prevConversations) => [
+          {
+            chatId: data.chatId,
+            name: data.name,
+            avatar: data.avatar,
+            type: data.type,
+            lastMessage: data.content,
+            lastMessageDate: data.date,
+            unreadMessageCount: 0,
+            isTyping: [],
+          },
+          ...prevConversations,
+        ]);
+      });
 
       socketManager.on("user_typing_conv", (data) => {
         if (data.userId === user?.userId) return;
         setConversations((prevConversations) =>
           prevConversations.map((conversation) =>
             conversation.chatId === data.chatId
-              ? { ...conversation, isTyping: true }
+              ? {
+                  ...conversation,
+                  isTyping: !conversation.isTyping.includes(data.username)
+                    ? [...conversation.isTyping, data.username]
+                    : conversation.isTyping,
+                }
               : conversation
           )
         );
@@ -107,7 +130,12 @@ const ConversationsHistory: React.FC = () => {
         setConversations((prevConversations) =>
           prevConversations.map((conversation) =>
             conversation.chatId === data.chatId
-              ? { ...conversation, isTyping: false }
+              ? {
+                  ...conversation,
+                  isTyping: conversation.isTyping.filter(
+                    (username) => username !== data.username
+                  ),
+                }
               : conversation
           )
         );
@@ -122,7 +150,6 @@ const ConversationsHistory: React.FC = () => {
       }
     };
   }, [isConnected, updateConversation, user?.userId]);
-
   return (
     <ScrollArea className="h-screen w-full">
       <div className="flex flex-col pt-0 w-full">

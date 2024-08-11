@@ -7,8 +7,9 @@ export interface Tabs {
 export interface Message {
   content: string;
   from_user: string;
+  sender: UserData;
   user_image: string;
-  type: "TEXT" | "IMAGE";
+  type: "TEXT" | "IMAGE" | "SYSTEM";
   __createdtime__: number;
 }
 
@@ -26,6 +27,7 @@ export interface ConversationType {
   data: ConversationData;
   lastMessageReadId: string;
   backgroundImage: number;
+  image?: string;
 }
 
 export interface ConversationData {
@@ -36,9 +38,9 @@ export interface ChatType {
   id: string;
   content: string;
   senderId: string;
-  senderName: string;
+  sender: UserData;
   createdAt: string;
-  type: "TEXT" | "IMAGE" | "LOCAL_IMAGE";
+  type: "TEXT" | "IMAGE" | "LOCAL_IMAGE" | "SYSTEM";
   file?: File;
   replyToId?: string;
   replyTo?: ChatType;
@@ -89,11 +91,12 @@ enum StatusFriendRequest {
 export type DisplayConversationHistory = {
   chatId: string;
   name: string;
-  avatar: number;
-  lastMessage: string;
+  avatar: number | string;
+  lastMessage: Message;
   lastMessageDate: string;
   unreadMessageCount: number;
-  isTyping: boolean;
+  isTyping: string[];
+  type: "PRIVATE" | "GROUP";
 };
 
 export enum ReactionType {
